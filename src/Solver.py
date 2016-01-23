@@ -7,8 +7,8 @@ class Solver:
         a = int(input("a "))
         b = int(input("b "))
         c = int(input("c "))
-        d1 = a + b + c
-        disc = math.sqrt(d1)
+        d = a + b + c
+        disc = math.sqrt(d)
         print(disc)
 
 Solver().demo()
