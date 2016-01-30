@@ -15,10 +15,3 @@ def one_hot_dataframe(data, cols, replace=False):
         data = data.drop(cols, axis=1)
         data = data.join(vecData)
     return (data, vecData, vec)
-
-training_data = pandas.read_csv('D:/WINTER/EE239/Project1/network_backup_dataset.csv')
-#for row in training_data:
-#    pprint(row)
-
-df, _, _ = one_hot_dataframe(training_data, ['Day of Week', 'Work-Flow-ID','File Name'], replace=True)
-print(df)
