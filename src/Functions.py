@@ -4,7 +4,7 @@ from matplotlib import pyplot
 from sklearn.cross_validation import cross_val_predict
 from sklearn.cross_validation import cross_val_score
 import matplotlib.pyplot as plt
-from sklearn import cross_validation
+from sklearn import cross_validation, linear_model
 from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import PolynomialFeatures
@@ -43,13 +43,14 @@ def callClassifierFeatures(obj,X_train,y_train,X_test,y_test,feature_cols, label
     pred=obj.predict(X_test)
     print('%s - Root Mean Squared Error: %.4f' % (label, rootMeanSquareError(pred, y_test)))
     #print('%s - Variance score: %.4f' % (label, obj.score(X_test, y_test)))
+    return pred
 
 def callCrossVal(obj,X,y,numberoffolds,label):
     predicted = cross_val_predict(obj, X, y, cv=numberoffolds)
     scores = cross_val_score(obj, X, y, cv=numberoffolds, scoring='mean_squared_error')
     print('%s - Averaged RMSE with CV %.4f ' % (label, np.mean(np.sqrt(-scores))))
     print('%s - Best RMSE with CV is: %.4f' % (label,bestRMSE(scores)))
-    return bestRMSE(scores)
+    return predicted
 
 def callCrossValPoly(obj,X,y,numberoffolds,degree,label):
     predicted = cross_val_predict(obj, X, y, cv=numberoffolds)
@@ -69,6 +70,24 @@ def polynomialRegression(obj,X_train,y_train,X_test,y_test, degree, label):
         rmseList.append(rmse)
         print("Root Mean Squared Error: (Polynomial): %.4f" % rmse)
         print('Variance score (Polynomial): %.4f' % model.score(X_test, y_test))
+    print('The best RMSE obtained is: %.4f for Degree: %d' % (minRMSE(rmseList),rmseList.index(minRMSE(rmseList))+1))
+    Plots.scatterPlot(degreeList, rmseList, 'Degree_of_Polynomial', 'RMSE', 'Title', 'green', 'polyreg')
+
+def polynomialRegressionNew(obj,X_train,y_train,X_test,y_test, degree, label):
+    rmseList = []
+    degreeList = []
+    for deg in range(1,degree+1):
+        poly = PolynomialFeatures(degree=deg)
+        X_ = poly.fit_transform(X_train)
+        predict_ = poly.fit_transform(X_test)
+        clf = linear_model.LinearRegression()
+        clf.fit(X_, y_train)
+        pred=clf.predict(predict_)
+        rmse=rootMeanSquareError(pred, y_test)
+        degreeList.append(degree)
+        rmseList.append(rmse)
+        print("Root Mean Squared Error: (Polynomial): %.4f" % rmse)
+       # print('Variance score (Polynomial): %.4f' % model.score(X_test, y_test))
     print('The best RMSE obtained is: %.4f for Degree: %d' % (minRMSE(rmseList),rmseList.index(minRMSE(rmseList))+1))
     Plots.scatterPlot(degreeList, rmseList, 'Degree_of_Polynomial', 'RMSE', 'Title', 'green', 'polyreg')
 
