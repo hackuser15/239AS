@@ -58,7 +58,8 @@ n_iter_search = 20
 random_search = RandomizedSearchCV(clf, param_distributions=param_dist,
                                    n_iter=n_iter_search)
 random_search.fit(X, y)
-print('Best Parameters for Random forest:'+random_search.best_params_)
+print('Best Parameters for Random forest:')
+print(random_search.best_params_)
 
 # param_grid = {"n_estimators":list(range(1, 101, 10)),
 #               "max_depth": list(range(1, 10, 5)),
@@ -71,6 +72,8 @@ print('Best Parameters for Random forest:'+random_search.best_params_)
 # grid_search = GridSearchCV(clf, param_grid=param_grid)
 # grid_search.fit(X, y)
 # print(grid_search.best_params_)
+
+# pred_rf = Functions.callClassifier(random_search, X_train, y_train, X_test, y_test,'Random Forests after tuning')
 
 model = RandomForestRegressor(n_estimators=50, min_samples_split= 4, max_features= 41, min_samples_leaf= 4, bootstrap= True, max_depth= 9)
 pred_rf = Functions.callClassifier(model, X_train, y_train, X_test, y_test,'Random Forests after tuning')
@@ -97,8 +100,8 @@ ds_test.setField( 'input', X_test)
 y_test_nn = y_test.copy().reshape( -1, 1 )
 ds_test.setField( 'target', y_test_nn )
 
-for hidden in range(1,50, 10):
-    for epoch in range(10,100,20):
+for hidden in range(1,5):
+    for epoch in range(10,40,10):
         hidden_size = hidden   # arbitrarily chosen
 
         net = buildNetwork(45, hidden_size, 1, bias = True)
