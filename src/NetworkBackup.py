@@ -22,7 +22,7 @@ one_hot_data, _, _ = one_hot_dataframe(network_data, ['Day of Week', 'Work-Flow-
 one_hot_subset = one_hot_data[one_hot_data['Week #'] <= 3]
 
 for num in range(0,5):
-    Functions.plotWorkFlow(one_hot_subset,num, 'actual')
+    Plots.plotWorkFlow(one_hot_subset,num, 'actual')
 
 feature_cols = [col for col in one_hot_data.columns if col not in ['Size of Backup (GB)']]
 X = one_hot_data[feature_cols]
@@ -57,10 +57,8 @@ param_dist = {"n_estimators":sp_randint(1, 100),
 n_iter_search = 20
 random_search = RandomizedSearchCV(clf, param_distributions=param_dist,
                                    n_iter=n_iter_search)
-
 random_search.fit(X, y)
 print('Best Parameters for Random forest:'+random_search.best_params_)
-# print(random_search.best_score_)
 
 # param_grid = {"n_estimators":list(range(1, 101, 10)),
 #               "max_depth": list(range(1, 10, 5)),
@@ -73,7 +71,6 @@ print('Best Parameters for Random forest:'+random_search.best_params_)
 # grid_search = GridSearchCV(clf, param_grid=param_grid)
 # grid_search.fit(X, y)
 # print(grid_search.best_params_)
-# print(grid_search.best_score_)
 
 model = RandomForestRegressor(n_estimators=50, min_samples_split= 4, max_features= 41, min_samples_leaf= 4, bootstrap= True, max_depth= 9)
 pred_rf = Functions.callClassifier(model, X_train, y_train, X_test, y_test,'Random Forests after tuning')
@@ -119,7 +116,7 @@ for num in range(0,5):
     data_workflow =  one_hot_data[one_hot_data['Work-Flow-ID=work_flow_'+str(num)] == 1]
     X = data_workflow[feature_cols]
     y = data_workflow['Size of Backup (GB)']
-    Plots.fitWorkFlow(LinearRegression(), X, y, num)
+    Functions.fitWorkFlow(LinearRegression(), X, y, num)
 
 Functions.polynomialRegression(LinearRegression(), X_train, y_train, X_test, y_test, 3,'NetworkBackupPoly')
 
