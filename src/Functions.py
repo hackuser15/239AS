@@ -64,7 +64,7 @@ def polynomialRegression(obj,X_train,y_train,X_test,y_test, degree, label):
         print("%s (Polynomial) - Root Mean Squared Error for degree %d: %.4f" % (label,degree,rmse))
         #print('Variance score (Polynomial): %.4f' % model.score(X_test, y_test))
     print('%s (Polynomial) - The best RMSE obtained is %.4f for degree: %d' % (label,minRMSE(rmseList),rmseList.index(minRMSE(rmseList))+1))
-    Plots.scatterPlot(degreeList, rmseList, 'Degree_of_Polynomial', 'RMSE', 'Degree VS RMSE', 'green', 'PolyRegression'+label)
+    Plots.linePlot(degreeList, rmseList, 'Degree_of_Polynomial', 'RMSE', 'Degree VS RMSE', 'blue', 'PolyRegression'+label)
 
 def polynomialRegressionCV(obj,X,y,numberoffolds,degree,label):
     rmseList = []
@@ -75,7 +75,7 @@ def polynomialRegressionCV(obj,X,y,numberoffolds,degree,label):
         degreeList.append(degree)
         rmseList.append(rmse)
     #print('%s (Polynomial) - The best RMSE obtained is: %.4f for Degree: %d' % (label,minRMSE(rmseList),rmseList.index(minRMSE(rmseList))+1))
-    Plots.scatterPlot(degreeList, rmseList, 'Degree_of_Polynomial', 'RMSE', 'Degree VS RMSE', 'red', 'PolyRegressionCV'+label)
+    Plots.linePlot(degreeList, rmseList, 'Degree_of_Polynomial', 'RMSE', 'Degree VS RMSE', 'red', 'PolyRegressionCV'+label)
 
 def callCrossValPoly(obj,X,y,numberoffolds,degree,label):
     predicted = cross_val_predict(obj, X, y, cv=numberoffolds)
