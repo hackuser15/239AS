@@ -31,11 +31,11 @@ def printFeatureCoefficients(x, y):
     zipped=list(zip(x, y))
     print(pd.DataFrame(data=zipped,columns=['Features','Coefficents']))
 
-def callClassifier(obj,X_train,y_train,X_test,y_test,feature_cols, label):
+def callClassifier(obj,X_train,y_train,X_test,y_test, label):
     obj.fit(X_train, y_train)
     pred=obj.predict(X_test)
     print('%s - Root Mean Squared Error: %.4f' % (label, rootMeanSquareError(pred, y_test)))
-    print('%s - Variance score: %.4f' % (label, obj.score(X_test, y_test)))
+    #print('%s - Variance score: %.4f' % (label, obj.score(X_test, y_test)))
 
 def callClassifierFeatures(obj,X_train,y_train,X_test,y_test,feature_cols, label):
     obj.fit(X_train, y_train)
@@ -80,9 +80,8 @@ def polynomialRegressionNew(obj,X_train,y_train,X_test,y_test, degree, label):
         poly = PolynomialFeatures(degree=deg)
         X_ = poly.fit_transform(X_train)
         predict_ = poly.fit_transform(X_test)
-        clf = linear_model.LinearRegression()
-        clf.fit(X_, y_train)
-        pred=clf.predict(predict_)
+        obj.fit(X_, y_train)
+        pred=obj.predict(predict_)
         rmse=rootMeanSquareError(pred, y_test)
         degreeList.append(degree)
         rmseList.append(rmse)
