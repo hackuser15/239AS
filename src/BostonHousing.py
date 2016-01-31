@@ -7,6 +7,7 @@ from sklearn import linear_model
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import make_pipeline
 from sklearn import cross_validation
+import Plots
 
 data = pd.read_csv('housing_data.csv')
 feature_cols = ['CRIM', 'ZN', 'INDUS', 'CHAS', 'NOX', 'RM', 'AGE', 'DIS', 'RAD', 'TAX', 'PTRATIO', 'B', 'LSTAT']
@@ -15,7 +16,9 @@ y = data.MEDV
 X_train, X_test, y_train, y_test = cross_validation.train_test_split(X, y, test_size=0.3, random_state=3)
 lm = LinearRegression()
 Functions.callClassifier(lm, X_train, y_train, X_test, y_test, feature_cols, 'Linear Regression')
+
 # Plotting
+#Plots.scatterPlot(lm.predict(X_test), y_test, 'abc', 'def', 'title', 'green')
 plt.scatter(lm.predict(X_test), y_test,  color='green')
 #plt.plot(diabetes_X_test, regr.predict(diabetes_X_test), color='blue',linewidth=3)
 plt.xlabel('Fitted')
@@ -32,13 +35,9 @@ plt.show()
 Functions.callCrossVal(lm, X, y, 10, 'Linear Regression')
 
 # Polynomial Regression
-# for degree in [3, 4, 5]:
  #   model = make_pipeline(PolynomialFeatures(degree), lm)
-  #  model.fit(X_train, y_train)
-  #  model.predict(X_test)
-  #  print("Residual sum of squares (Polynomial): %.2f" % np.mean((lm.predict(X_test) - y_test) ** 2))
-  #  print('Variance score (Polynomial): %.2f' % lm.score(X_test, y_test))
-
+Functions.polynomialRegression(lm, X_train, y_train, X_test, y_test, 'Poly Linear Regression')
+Functions.polynomialRegressionCV(lm, X, y, 10, 'Linear Regression')
 # Ridge
 ridge = linear_model.RidgeCV(alphas=[0.1, 0.01, 0.001])
 Functions.callClassifier(ridge, X_train, y_train, X_test, y_test, feature_cols, 'Ridge')
