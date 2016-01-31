@@ -36,6 +36,7 @@ def callClassifier(obj,X_train,y_train,X_test,y_test, label):
     pred=obj.predict(X_test)
     print('%s - Root Mean Squared Error: %.4f' % (label, rootMeanSquareError(pred, y_test)))
     #print('%s - Variance score: %.4f' % (label, obj.score(X_test, y_test)))
+    return pred
 
 def callClassifierFeatures(obj,X_train,y_train,X_test,y_test,feature_cols, label):
     obj.fit(X_train, y_train)
@@ -68,8 +69,8 @@ def polynomialRegression(obj,X_train,y_train,X_test,y_test, degree, label):
         rmse=rootMeanSquareError(pred, y_test)
         degreeList.append(degree)
         rmseList.append(rmse)
-        print("Root Mean Squared Error: (Polynomial): %.4f" % rmse)
-        print('Variance score (Polynomial): %.4f' % model.score(X_test, y_test))
+        print("Root Mean Squared Error (Polynomial) for degree %d: %.4f" % (degree,rmse))
+        #print('Variance score (Polynomial): %.4f' % model.score(X_test, y_test))
     print('The best RMSE obtained is: %.4f for Degree: %d' % (minRMSE(rmseList),rmseList.index(minRMSE(rmseList))+1))
     Plots.scatterPlot(degreeList, rmseList, 'Degree_of_Polynomial', 'RMSE', 'Title', 'green', 'polyreg')
 
