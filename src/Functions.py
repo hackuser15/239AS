@@ -1,14 +1,12 @@
 import numpy as np
 import pandas as pd
-from matplotlib import pyplot
+import matplotlib.pyplot as plt
+import Plots
 from sklearn.cross_validation import cross_val_predict
 from sklearn.cross_validation import cross_val_score
-import matplotlib.pyplot as plt
-from sklearn import cross_validation, linear_model
-from sklearn.linear_model import LinearRegression
+from sklearn import cross_validation
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import PolynomialFeatures
-import Plots
 
 def rootMeanSquareError(x, y):
     return np.sqrt(np.mean((x - y) ** 2))
@@ -49,15 +47,9 @@ def callClassifierFeatures(obj,X_train,y_train,X_test,y_test,feature_cols, label
 def callCrossVal(obj,X,y,numberoffolds,label):
     predicted = cross_val_predict(obj, X, y, cv=numberoffolds)
     scores = cross_val_score(obj, X, y, cv=numberoffolds, scoring='mean_squared_error')
-    print('%s - Averaged RMSE with CV %.4f ' % (label, np.mean(np.sqrt(-scores))))
-    print('%s - Best RMSE with CV is: %.4f' % (label,bestRMSE(scores)))
+    print('%s - Averaged RMSE with CV: %.4f ' % (label, np.mean(np.sqrt(-scores))))
+    print('%s - Best RMSE with CV: %.4f' % (label,bestRMSE(scores)))
     return predicted
-
-def callCrossValPoly(obj,X,y,numberoffolds,degree,label):
-    predicted = cross_val_predict(obj, X, y, cv=numberoffolds)
-    scores = cross_val_score(obj, X, y, cv=numberoffolds, scoring='mean_squared_error')
-    print('%s - The best RMSE obtained with CV for degree %d is: %.4f' % (label,degree,bestRMSE(scores)))
-    return bestRMSE(scores)
 
 def polynomialRegression(obj,X_train,y_train,X_test,y_test, degree, label):
     rmseList = []
@@ -69,48 +61,28 @@ def polynomialRegression(obj,X_train,y_train,X_test,y_test, degree, label):
         rmse=rootMeanSquareError(pred, y_test)
         degreeList.append(degree)
         rmseList.append(rmse)
-        print("Root Mean Squared Error (Polynomial) for degree %d: %.4f" % (degree,rmse))
+        print("%s (Polynomial) - Root Mean Squared Error for degree %d: %.4f" % (label,degree,rmse))
         #print('Variance score (Polynomial): %.4f' % model.score(X_test, y_test))
-    print('The best RMSE obtained is: %.4f for Degree: %d' % (minRMSE(rmseList),rmseList.index(minRMSE(rmseList))+1))
-    Plots.scatterPlot(degreeList, rmseList, 'Degree_of_Polynomial', 'RMSE', 'Title', 'green', 'polyreg')
-
-def polynomialRegressionNew(obj,X_train,y_train,X_test,y_test, degree, label):
-    rmseList = []
-    degreeList = []
-    for deg in range(1,degree+1):
-        poly = PolynomialFeatures(degree=deg)
-        X_ = poly.fit_transform(X_train)
-        predict_ = poly.fit_transform(X_test)
-        obj.fit(X_, y_train)
-        pred=obj.predict(predict_)
-        rmse=rootMeanSquareError(pred, y_test)
-        degreeList.append(degree)
-        rmseList.append(rmse)
-        print("Root Mean Squared Error: (Polynomial): %.4f" % rmse)
-       # print('Variance score (Polynomial): %.4f' % model.score(X_test, y_test))
-    print('The best RMSE obtained is: %.4f for Degree: %d' % (minRMSE(rmseList),rmseList.index(minRMSE(rmseList))+1))
-    Plots.scatterPlot(degreeList, rmseList, 'Degree_of_Polynomial', 'RMSE', 'Title', 'green', 'polyreg')
+    print('%s (Polynomial) - The best RMSE obtained is %.4f for degree: %d' % (label,minRMSE(rmseList),rmseList.index(minRMSE(rmseList))+1))
+    Plots.linePlot(degreeList, rmseList, 'Degree_of_Polynomial', 'RMSE', 'Degree VS RMSE', 'blue', 'PolyRegression'+label)
 
 def polynomialRegressionCV(obj,X,y,numberoffolds,degree,label):
     rmseList = []
     degreeList = []
     for degree in range(1,degree+1):
         model = make_pipeline(PolynomialFeatures(degree), obj)
-        rmse = callCrossValPoly(model, X, y, numberoffolds, degree, 'Linear Regression Poly')
+        rmse = callCrossValPoly(model, X, y, numberoffolds, degree, label)
         degreeList.append(degree)
         rmseList.append(rmse)
-    print('The best RMSE obtained is: %.4f for Degree: %d' % (minRMSE(rmseList),rmseList.index(minRMSE(rmseList))+1))
-    Plots.scatterPlot(degreeList, rmseList, 'Degree_of_Polynomial', 'RMSE', 'Title', 'red', 'polyregCV')
+    #print('%s (Polynomial) - The best RMSE obtained is: %.4f for Degree: %d' % (label,minRMSE(rmseList),rmseList.index(minRMSE(rmseList))+1))
+    Plots.linePlot(degreeList, rmseList, 'Degree_of_Polynomial', 'RMSE', 'Degree VS RMSE', 'red', 'PolyRegressionCV'+label)
 
-def plotWorkFlow(data, num, label):
-    workflow = data[data['Work-Flow-ID=work_flow_' + str(num)] == 1]
-    num_operation = workflow['Size of Backup (GB)'].size
-    plt.scatter(np.linspace(1, num_operation, num_operation), workflow['Size of Backup (GB)'])
-    plt.xlabel('Operations')
-    plt.ylabel('Size of Backup (GB)')
-    plt.title('Workflow '+ str(num)+ ' ' + label)
-    plt.savefig('Workflow_' + str(num) + '_' + label + '.png')
-    plt.clf()
+def callCrossValPoly(obj,X,y,numberoffolds,degree,label):
+    predicted = cross_val_predict(obj, X, y, cv=numberoffolds)
+    scores = cross_val_score(obj, X, y, cv=numberoffolds, scoring='mean_squared_error')
+    AvgRMSE = np.mean(np.sqrt(-scores))
+    print('%s (Polynomial) - Averaged RMSE with CV: %.4f for degree: %d' % (label,AvgRMSE,degree))
+    return AvgRMSE
 
 def fitWorkFlow(model, X, y, num):
     X_train, X_test, y_train, y_test = cross_validation.train_test_split(X, y, test_size=0.3, random_state=3)
