@@ -84,16 +84,6 @@ def callCrossValPoly(obj,X,y,numberoffolds,degree,label):
     print('%s (Polynomial) - Averaged RMSE with CV: %.4f for degree: %d' % (label,AvgRMSE,degree))
     return AvgRMSE
 
-def plotWorkFlow(data, num, label):
-    workflow = data[data['Work-Flow-ID=work_flow_' + str(num)] == 1]
-    num_operation = workflow['Size of Backup (GB)'].size
-    plt.scatter(np.linspace(1, num_operation, num_operation), workflow['Size of Backup (GB)'])
-    plt.xlabel('Operations')
-    plt.ylabel('Size of Backup (GB)')
-    plt.title('Workflow '+ str(num)+ ' ' + label)
-    plt.savefig('Workflow_' + str(num) + '_' + label + '.png')
-    plt.clf()
-
 def fitWorkFlow(model, X, y, num):
     X_train, X_test, y_train, y_test = cross_validation.train_test_split(X, y, test_size=0.3, random_state=3)
     model.fit(X_train, y_train)
