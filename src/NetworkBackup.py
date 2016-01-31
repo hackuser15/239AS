@@ -37,7 +37,7 @@ y = one_hot_data['Size of Backup (GB)']
 X_train, X_test, y_train, y_test = cross_validation.train_test_split(X, y, test_size=0.3, random_state=3)
 
 model = LinearRegression()
-Functions.callClassifier(model, X_train, y_train, X_test, y_test, feature_cols, 'Linear Regression')
+Functions.callClassifierFeatures(model, X_train, y_train, X_test, y_test, feature_cols, 'Linear Regression')
 #model.fit(X_train, y_train)
 #print('Linear Regression - RMSE: %.4f' % (np.sqrt(np.sum((model.predict(X_test) - y_test) ** 2)/y_test.size)))
 
@@ -64,8 +64,9 @@ Plots.residualPlot(pred, pred - y_test, 'Fitted','Resuduals','Fitted VS Residual
 Functions.callCrossVal(model, X, y, 10, 'Linear Regression')
 #####################################################################################
 model = RandomForestRegressor(n_estimators=20, max_depth=4, max_features='auto')
-model.fit(X_train, y_train)
-print('Random Forests Initial - RMSE: %.4f' % (np.sqrt(np.sum((model.predict(X_test) - y_test) ** 2)/y_test.size)))
+Functions.callClassifier(model, X_train, y_train, X_test, y_test,'Random Forests Initial')
+# model.fit(X_train, y_train)
+# print('Random Forests Initial - RMSE: %.4f' % (np.sqrt(np.sum((model.predict(X_test) - y_test) ** 2)/y_test.size)))
 
 # clf = RandomForestRegressor()
 # param_dist = {"n_estimators":sp_randint(1, 100),
@@ -99,11 +100,11 @@ print('Random Forests Initial - RMSE: %.4f' % (np.sqrt(np.sum((model.predict(X_t
 
 #model = RandomForestRegressor(n_estimators=79, min_samples_split= 8, max_features= 40, min_samples_leaf= 5, bootstrap= True, max_depth= None)
 model = RandomForestRegressor(n_estimators=50, min_samples_split= 4, max_features= 41, min_samples_leaf= 4, bootstrap= True, max_depth= 9)
-model.fit(X_train, y_train)
-print('Random Forests after tuning - RMSE: %.4f' % (np.sqrt(np.sum((model.predict(X_test) - y_test) ** 2)/y_test.size)))
+pred_rf = Functions.callClassifier(model, X_train, y_train, X_test, y_test,'Random Forests after tuning')
+# model.fit(X_train, y_train)
+# print('Random Forests after tuning - RMSE: %.4f' % (np.sqrt(np.sum((model.predict(X_test) - y_test) ** 2)/y_test.size)))
 
-pred = model.predict(X_test)
-Plots.scatterPlot(pred, y_test, 'Fitted','Actual','Fitted VS Actual RF','green','RandomForestActualvsFit')
+Plots.scatterPlot(pred_rf, y_test, 'Fitted','Actual','Fitted VS Actual RF','green','RandomForestActualvsFit')
 # plt.scatter(model.predict(X_test), y_test,  color='green')
 # plt.xlabel('Fitted')
 # plt.ylabel('Actual')
@@ -112,10 +113,10 @@ Plots.scatterPlot(pred, y_test, 'Fitted','Actual','Fitted VS Actual RF','green',
 # plt.savefig('RandomForestActualvsFit.png')
 # plt.clf()
 
-Plots.residualPlot(pred, pred - y_test, 'Fitted','Resuduals','Fitted VS Residual','green','RandomForestFitvsResidual')
+Plots.residualPlot(pred_rf, pred_rf - y_test, 'Fitted','Resuduals','Fitted VS Residual','green','RandomForestFitvsResidual')
 
 pred = X_test.copy()
-pred['Size of Backup (GB)'] = pandas.Series(model.predict(X_test), index=pred.index)
+pred['Size of Backup (GB)'] = pandas.Series(pred_rf, index=pred.index)
 predicted_subset = pred[pred['Week #'] <= 3]
 for num in range(0,5):
     Functions.plotWorkFlow(predicted_subset, num, 'predicted')
