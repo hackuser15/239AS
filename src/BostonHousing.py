@@ -13,12 +13,12 @@ X_train, X_test, y_train, y_test = cross_validation.train_test_split(X, y, test_
 lm = LinearRegression()
 predicted=Functions.callClassifierFeatures(lm, X_train, y_train, X_test, y_test, feature_cols, 'Linear Regression')
 # Plotting
-Plots.scatterPlot(predicted, y_test, 'Fitted', 'Actual', 'Fitted VS Actual', 'green', 'ScatterPlot')
-Plots.residualPlot(predicted, (predicted - y_test), 'Fitted', 'Residual', 'Fitted VS Residual', 'blue', 'ResidualPlot')
+Plots.scatterPlot(predicted, y_test, 'Fitted', 'Actual', 'Fitted VS Actual LR', 'green', 'HousingLRScatterPlot')
+Plots.residualPlot(predicted, (predicted - y_test), 'Fitted', 'Residual', 'Fitted VS Residual LR', 'blue', 'HousingLRResidualPlot')
 # LR - cross val
 predicted=Functions.callCrossVal(lm, X, y, 10, 'Linear Regression')
-Plots.scatterPlot(predicted, y, 'Fitted', 'Actual', 'Fitted VS Actual', 'green', 'ScatterPlotCV')
-Plots.residualPlot(predicted, (predicted - y), 'Fitted', 'Residual', 'Fitted VS Residual', 'blue', 'ResidualPlotCV')
+Plots.scatterPlot(predicted, y, 'Fitted', 'Actual', 'Fitted VS Actual LR-CV', 'green', 'HousingLRScatterPlotCV')
+Plots.residualPlot(predicted, (predicted - y), 'Fitted', 'Residual', 'Fitted VS Residual LR-CV', 'blue', 'HousingLRResidualPlotCV')
 # Polynomial Regression
 Functions.polynomialRegression(lm, X_train, y_train, X_test, y_test, 6,'Linear Regression')
 Functions.polynomialRegressionCV(lm, X, y, 10, 6, 'Linear Regression')

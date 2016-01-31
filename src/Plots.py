@@ -7,7 +7,7 @@ def scatterPlot(x, y, xlabel, ylabel, title, c, name):
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
-    plt.show()
+    #plt.show()
     plt.savefig(name+'.png')
     plt.clf()
 
@@ -17,6 +17,6 @@ def residualPlot(x, y, xlabel, ylabel, title, c, name):
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
-    plt.show()
+    #plt.show()
     plt.savefig(name+'.png')
     plt.clf()
