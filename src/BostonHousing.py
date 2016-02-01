@@ -24,9 +24,11 @@ Functions.polynomialRegression(lm, X_train, y_train, X_test, y_test, 6,'Linear R
 Functions.polynomialRegressionCV(lm, X, y, 10, 6, 'Linear Regression')
 # Ridge
 ridge = linear_model.RidgeCV(alphas=[0.1, 0.01, 0.001])
-Functions.callClassifier(ridge, X_train, y_train, X_test, y_test, 'Ridge')
+Functions.callClassifierFeatures(ridge, X_train, y_train, X_test, y_test,feature_cols, 'Ridge')
+print("The tuned alpha value selected for Ridge is: %.4f" %ridge.alpha_)
 Functions.callCrossVal(ridge, X, y, 10, 'Ridge')
 # Lasso
 lasso = linear_model.LassoCV(alphas=[0.1, 0.01, 0.001])
-Functions.callClassifier(lasso, X_train, y_train, X_test, y_test, 'Lasso')
+Functions.callClassifierFeatures(lasso, X_train, y_train, X_test, y_test,feature_cols, 'Lasso')
+print("The tuned alpha value selected for Lasso is: %.4f" %lasso.alpha_)
 Functions.callCrossVal(lasso, X, y, 10, 'Lasso')
