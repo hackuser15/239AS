@@ -8,14 +8,17 @@ train_1 = fetch_20newsgroups(subset='train', categories = categories, shuffle = 
 #print("\n".join(train_1.data[0].split("\n")[:3]))
 
 length = len(train_1.data)
-print("Total records = ",len(train_1.data))
+#print("Total records = ",len(train_1.data))
 
-print(len(train_1))
-print(train_1.target_names)
+#print(len(train_1))
+#print(train_1.target_names)
 
-tick_list = list(range(len(categories)))
-print(tick_list)
+#tick_list = list(range(len(categories)))
+#print(tick_list)
 category_count = {}
+
+computer_count = 0
+recreational_count = 0
 
 for i in range(0,length):
     category = train_1.target_names[train_1.target[i]]
@@ -25,8 +28,14 @@ for i in range(0,length):
     else:
         counter = 1
     category_count[category] = counter
+    if("comp" in category):
+        computer_count = computer_count + 1
+    else:
+        recreational_count = recreational_count + 1
 
 
+print("Computer category count= "+str(computer_count))
+print("Recreational category count= "+str(recreational_count))
 Plots.barPlot(category_count)
 
 
