@@ -27,9 +27,9 @@ for i in range(0,length):
     category_count[category] = counter
 
 
-for key,value in category_count.items():
-    print(key," = ",value)
+Plots.barPlot(category_count)
+
 
 #print(list(category_count.keys()))
-Plots.histogram(list(category_count.values()), "Categories", "Frequency","Plot 1","red", 'File1', list(range(len(categories))),train_1.target_names)
+#Plots.histogram(list(category_count.values()), "Categories", "Frequency","Plot 1","red", 'File1', list(range(len(categories))),train_1.target_names)
 # Plots.linePlot(list(category_count.keys()), list(category_count.values()),"Categories","Frequency","Plot 1","red", 'File1',list(range(len(categories))),train_1.target_names)
