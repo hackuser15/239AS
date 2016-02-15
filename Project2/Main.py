@@ -6,6 +6,9 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction import text
 import string
+
+from sklearn.multiclass import OneVsOneClassifier, OneVsRestClassifier
+
 import Plots
 import Functions
 import collections
@@ -15,8 +18,6 @@ from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
 import math
 
-import gensim
-from gensim import corpora, models, utils
 from sklearn.decomposition import TruncatedSVD
 from sklearn.pipeline import Pipeline
 
@@ -30,6 +31,7 @@ from sklearn.svm import SVC, LinearSVC
 
 
 # Fetching data for 8 specific categories:
+
 computer_count = 0
 recreational_count = 0
 categories = ['comp.graphics','comp.os.ms-windows.misc','comp.sys.ibm.pc.hardware','comp.sys.mac.hardware','rec.autos','rec.motorcycles','rec.sport.baseball','rec.sport.hockey']
@@ -98,7 +100,7 @@ for i in range(0, len(indices)):
         for word_index in non_zero_word_indices:
             freq = X_train_counts[curr_doc, word_index]
             if(word_index in significant_terms):
-                significant_terms[word_index] = significant_terms[word_index] + freq;
+                significant_terms[word_index] = significant_terms[word_index] + freq
             else:
                 significant_terms[word_index] = freq
             list_count[word_index] = list_count[word_index] + freq
@@ -123,48 +125,74 @@ for i in range(0, len(indices)):
 Functions.printTop10(final_terms, count_vect)
 
 ########################## END OF C ####################################
-
 #Applying LSI to the TF-IDF matrix to reduce to 50 features
 
-svd = TruncatedSVD(n_components=50, random_state=25)
-# Pipeline Vectorizer and SVD
+categories = ['alt.atheism', 'soc.religion.christian']
+train_data = fetch_20newsgroups(subset='train', categories=categories, shuffle=True, random_state=40)
+test_data = fetch_20newsgroups(subset='test', categories=categories, shuffle=True, random_state=40) #categories=categories
+vectorizer = TfidfVectorizer() #this value should come from up, should it be with params?
+# http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html#sklearn.feature_extraction.text.TfidfVectorizer
+svd = TruncatedSVD(n_components=50, n_iter=5, random_state=25)
 svd_transformer = Pipeline([('tfidf', vectorizer),
                             ('svd', svd)])
-svd_matrix = svd_transformer.fit_transform(train_all.data)
-#print("Pipeline\n",svd_matrix)
-print(svd_matrix.shape)
+svd_matrix = svd_transformer.fit_transform(train_data.data)
 
 ########################## END OF D ####################################
-twenty_test = fetch_20newsgroups(subset='test', shuffle=True, random_state=40)
-
-
-#Linear Support Vector Machine
-svcl = LinearSVC(loss='squared_hinge', penalty='l2', max_iter=5, random_state=40)
-
-Functions.newsGroupClassifier(svd_transformer,svcl,train_all,twenty_test)
+#Support Vector Machine
+print("Support Vector Machine Analysis")
+svc = SVC(kernel='linear', probability=True, random_state=40) #decision_function_shape='ovo',max_iter=5
+Functions.newsGroupClassifier(svd_transformer,svc,train_data,test_data,'Support Vector Machine')
 
 ########################## END OF E ####################################
-
 #Soft margin SVM
 
-
+# Grid Search
+print("Soft Margin SVM Analysis")
+pipeline = Pipeline([
+    ('vect', svd_transformer),
+    ('svmobj', svc),
+])
+parameters = {
+    'svmobj__gamma': [1e-3, 1e3]
+}
+if __name__ == "__main__":
+        grid_search = GridSearchCV(pipeline, parameters, cv=5) #n_jobs=1
+        grid_search.fit(train_data.data, train_data.target)
+        predicted = grid_search.predict(test_data.data)
+        calcPrintResults(test_data,predicted,'Soft Margin SVM')
+        print("Best parameters set:")
+        best_parameters = grid_search.best_estimator_.get_params()
+        for param_name in sorted(parameters.keys()):
+            print("\t%s: %r" % (param_name, best_parameters[param_name]))
 
 ########################## END OF F ####################################
-
 #Naive Bayes
+print("Naive Bayes Analysis")
 #naivebayes = MultinomialNB()
 naivebayes = GaussianNB()
-Functions.newsGroupClassifier(svd_transformer,naivebayes,train_all,twenty_test)
+Functions.newsGroupClassifier(svd_transformer,naivebayes,train_data,test_data,'Naive Bayes')
 
 ########################## END OF G ####################################
-
 #Logistic Regression
+print("Logistic Regression Analysis")
 logistic = LogisticRegression(penalty='l2', max_iter=5, random_state=40)
-Functions.newsGroupClassifier(svd_transformer,logistic,train_all,twenty_test)
+Functions.newsGroupClassifier(svd_transformer,logistic,train_data,test_data,'Logistic Regression')
 
 ########################## END OF H ####################################
+#MultiClass Classification
+#Probably repeat the entire process from svd
 
+categories = ['comp.sys.ibm.pc.hardware' , 'comp.sys.mac.hardware', 'misc.forsale', 'soc.religion.christian']
+train_data = fetch_20newsgroups(subset='train',categories=categories, shuffle=True, random_state=40)
+test_data = fetch_20newsgroups(subset='test',categories=categories, shuffle=True, random_state=40)
+print("OneVsRestClassifier Analysis")
+obj = OneVsRestClassifier(svc)
+Functions.newsGroupMultiClassifier(svd_transformer, obj, train_data, test_data, 'OneVsRestClassifier')
+print("OneVsOneClassifier Analysis")
+svc = SVC(kernel='linear',class_weight='balanced',probability=True,random_state=40)
+obj = OneVsOneClassifier(svc)
+Functions.newsGroupMultiClassifier(svd_transformer, obj, train_data, test_data, 'OneVsOneClassifier')
 
-
+########################## END OF I ####################################
 
 
