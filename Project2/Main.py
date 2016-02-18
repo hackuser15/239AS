@@ -1,34 +1,17 @@
-from nltk.chunk.named_entity import shape
-from scipy.odr import models
-from sklearn.datasets import fetch_20newsgroups
-from sklearn.feature_extraction.text import CountVectorizer
-import numpy as np
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.feature_extraction import text
-import string
-
-from sklearn.multiclass import OneVsOneClassifier, OneVsRestClassifier
-
-import Plots
-import Functions
-import collections
-import nltk
-from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
-from nltk.stem.wordnet import WordNetLemmatizer
 import math
 
+import Functions
+import Plots
+from sklearn.datasets import fetch_20newsgroups
 from sklearn.decomposition import TruncatedSVD
-from sklearn.pipeline import Pipeline
-
-from datetime import time
-from pprint import pprint
-from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.grid_search import GridSearchCV
-from sklearn.linear_model import SGDClassifier, LogisticRegression
-from sklearn.naive_bayes import MultinomialNB, GaussianNB
-from sklearn.svm import SVC, LinearSVC
-
+from sklearn.linear_model import LogisticRegression
+from sklearn.multiclass import OneVsOneClassifier, OneVsRestClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.pipeline import Pipeline
+from sklearn.svm import SVC
 
 # Fetching data for 8 specific categories:
 
@@ -63,7 +46,7 @@ train_all = fetch_20newsgroups(subset='train', shuffle = True, random_state=42)
 no_of_docs = len(train_all.data)
 
 #Clean all documents
-for i in range(0, 3):                   #Change this to no_of_docs
+for i in range(0, no_of_docs):                   #Change this to no_of_docs
     cleaned_doc = Functions.cleanDoc(train_all.data[i])
     train_all.data[i] = cleaned_doc
 
@@ -73,6 +56,16 @@ vectorizer = TfidfVectorizer()
 vectors = vectorizer.fit_transform(train_all.data)
 
 print("Term Count = ",vectors.shape[1])
+
+#Cleaning the test data as well
+test_all = fetch_20newsgroups(subset='test', shuffle = True, random_state=42)
+no_of_test_docs = len(test_all.data)
+
+#Clean all documents
+for i in range(0, no_of_test_docs):                   #Change this to no_of_docs
+    cleaned_doc = Functions.cleanDoc(test_all.data[i])
+    test_all.data[i] = cleaned_doc
+
 
 ########################## END OF B ####################################
 categories = ['comp.sys.ibm.pc.hardware', 'comp.sys.mac.hardware', 'misc.forsale', 'soc.religion.christian']

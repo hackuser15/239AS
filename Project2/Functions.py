@@ -4,7 +4,7 @@ from sklearn.pipeline import make_pipeline, Pipeline
 from sklearn import metrics
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
-from nltk.stem.wordnet import WordNetLemmatizer
+from nltk.stem.porter import *
 import string
 import collections
 
@@ -38,12 +38,11 @@ def calcPrintResults(twenty_test,predicted,name):
 #Function to remove punctuation,stop words and lemmatizing
 def cleanDoc(doc):
     stop = stopwords.words('english')
-    lmtzr = WordNetLemmatizer()
-    #print("Original\n",doc)
+    stemmer = PorterStemmer()    #print("Original\n",doc)
     cleaned =""
     for i in word_tokenize(doc.lower()):
         if i not in stop:
-            root = lmtzr.lemmatize(i)
+            root = stemmer.stem(i)
             if root not in string.punctuation:
                 cleaned = cleaned+ " "+root
     return cleaned
