@@ -1,5 +1,7 @@
 import math
 
+import sklearn
+
 import Functions
 import Plots
 from sklearn.datasets import fetch_20newsgroups
@@ -119,10 +121,11 @@ Functions.printTop10(final_terms, count_vect)
 
 ########################## END OF C ####################################
 #Applying LSI to the TF-IDF matrix to reduce to 50 features
-
-categories = ['alt.atheism', 'soc.religion.christian']
-train_data = fetch_20newsgroups(subset='train', categories=categories, shuffle=True, random_state=40)
-test_data = test_all
+train_data = sklearn.datasets.load_files("20news-bydate-train")
+test_data = sklearn.datasets.load_files("20news-bydate-test")
+#categories = ['alt.atheism', 'soc.religion.christian']
+#train_data = fetch_20newsgroups(subset='train', categories=categories, shuffle=True, random_state=40)
+#test_data = test_all
 vectorizer = TfidfVectorizer() #this value should come from up, should it be with params?
 # http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html#sklearn.feature_extraction.text.TfidfVectorizer
 svd = TruncatedSVD(n_components=50, n_iter=5, random_state=25)

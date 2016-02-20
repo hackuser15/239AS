@@ -1,3 +1,4 @@
+import sklearn
 from sklearn import metrics
 
 from nltk.chunk.named_entity import shape
@@ -34,10 +35,13 @@ from Project2.Functions import calcPrintResults
 
 #Applying LSI to the TF-IDF matrix to reduce to 50 features
 
-
+#train_data = sklearn.datasets.load_files("E:\\Punit\\D\\UCLA\\Winter15\\CS239AS\\Projects\\Project2\\Test\\20news-bydate-train")
+#test_data = sklearn.datasets.load_files("E:\\Punit\\D\\UCLA\\Winter15\\CS239AS\\Projects\\Project2\\Test\\20news-bydate-test")
+train_data = sklearn.datasets.load_files("20news-bydate-train")
+test_data = sklearn.datasets.load_files("20news-bydate-test")
 categories = ['alt.atheism', 'soc.religion.christian']
-train_data = fetch_20newsgroups(subset='train', categories=categories, shuffle=True, random_state=40)
-test_data = fetch_20newsgroups(subset='test', categories=categories, shuffle=True, random_state=40) #categories=categories
+#train_data = fetch_20newsgroups(subset='train', categories=categories, shuffle=True, random_state=40)
+#test_data = fetch_20newsgroups(subset='test', categories=categories, shuffle=True, random_state=40) #categories=categories
 vectorizer = TfidfVectorizer() #this value should come from up, should it be with params?
 # http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html#sklearn.feature_extraction.text.TfidfVectorizer
 svd = TruncatedSVD(n_components=50, n_iter=5, random_state=25)
