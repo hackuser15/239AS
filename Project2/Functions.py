@@ -35,7 +35,19 @@ def calcPrintResults(twenty_test,predicted,name):
     print("Accuracy for this classifier:%s\n" % np.mean(predicted == twenty_test.target))
     print("Confusion matrix:\n%s\n" % metrics.confusion_matrix(twenty_test.target, predicted))
 
+def cleaned_datawithDecode(train_data):
+    no_of_docs = len(train_data.data)
+    for i in range(0, no_of_docs):
+        cleaned_doc = cleanDoc(train_data.data[i].decode())
+        train_data.data[i] = cleaned_doc
+    return train_data
 
+def cleaned_data(train_data):
+    no_of_docs = len(train_data.data)
+    for i in range(0, no_of_docs):
+        cleaned_doc = cleanDoc(train_data.data[i])
+        train_data.data[i] = cleaned_doc
+    return train_data
 #Function to remove punctuation,stop words and lemmatizing
 def cleanDoc(doc):
     stop = stopwords.words('english')

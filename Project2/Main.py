@@ -15,7 +15,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
 
 # Fetching data for 8 specific categories:
-from Project2.Functions import calcPrintResults, cleanDoc
+from Project2.Functions import calcPrintResults, cleanDoc, cleaned_data
 
 computer_count = 0
 recreational_count = 0
@@ -47,27 +47,30 @@ print("Recreational category count= "+str(recreational_count))
 Plots.barPlot(category_count)
 
 ########################## END OF A ####################################
-no_of_docs = len(train_data.data)
 
-#Clean all documents
-for i in range(0, no_of_docs):                   #Change this to no_of_docs
-    cleaned_doc = Functions.cleanDoc(train_data.data[i])
-    train_data.data[i] = cleaned_doc
+train_data=cleaned_data(train_data)
+test_data=cleaned_data(test_data)
+# no_of_docs = len(train_data.data)
+#
+# #Clean all documents
+# for i in range(0, no_of_docs):                   #Change this to no_of_docs
+#     cleaned_doc = Functions.cleanDoc(train_data.data[i])
+#     train_data.data[i] = cleaned_doc
 
 
 #Convert to TfIdfVector
-vectorizer = TfidfVectorizer(tokenizer=cleanDoc)
+vectorizer = TfidfVectorizer()
 vectors = vectorizer.fit_transform(train_data.data)
 
 print("Term Count = ",vectors.shape[1])
 
-#Cleaning the test data as well
-no_of_test_docs = len(test_data.data)
-
-#Clean all documents
-for i in range(0, no_of_test_docs):                   #Change this to no_of_docs
-    cleaned_doc = Functions.cleanDoc(test_data.data[i])
-    test_data.data[i] = cleaned_doc
+# #Cleaning the test data as well
+# no_of_test_docs = len(test_data.data)
+#
+# #Clean all documents
+# for i in range(0, no_of_test_docs):                   #Change this to no_of_docs
+#     cleaned_doc = Functions.cleanDoc(test_data.data[i])
+#     test_data.data[i] = cleaned_doc
 
 
 ########################## END OF B ####################################
@@ -125,7 +128,8 @@ Functions.printTop10(final_terms, count_vect)
 #Applying LSI to the TF-IDF matrix to reduce to 50 features
 train_data = sklearn.datasets.load_files("20news-bydate-train")
 test_data = sklearn.datasets.load_files("20news-bydate-test")
-#vectorizer = TfidfVectorizer()
+train_data=cleaned_data(train_data)
+test_data=cleaned_data(test_data)
 svd = TruncatedSVD(n_components=50, n_iter=5, random_state=25)
 svd_transformer = Pipeline([('tfidf', vectorizer),
                             ('svd', svd)])
@@ -176,6 +180,8 @@ Functions.newsGroupClassifier(svd_transformer,logistic,train_data,test_data,'Log
 categories = ['comp.sys.ibm.pc.hardware' , 'comp.sys.mac.hardware', 'misc.forsale', 'soc.religion.christian']
 train_data = fetch_20newsgroups(subset='train',categories=categories, shuffle=True, random_state=40)
 test_data = fetch_20newsgroups(subset='test',categories=categories, shuffle=True, random_state=40)
+train_data=cleaned_data(train_data)
+test_data=cleaned_data(test_data)
 print("Naive Bayes Multi Class Analysis")
 naivebayes = GaussianNB()
 Functions.newsGroupMultiClassifier(svd_transformer,naivebayes,train_data,test_data,'Naive Bayes MultiClass')
