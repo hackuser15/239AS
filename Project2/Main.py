@@ -138,7 +138,7 @@ svd_matrix = svd_transformer.fit_transform(train_data.data)
 ########################## END OF D ####################################
 #Support Vector Machine
 print("Support Vector Machine Analysis")
-svc = SVC(kernel='linear', probability=True, random_state=40) #decision_function_shape='ovo',max_iter=5
+svc = SVC(kernel='linear', probability=True, random_state=40)
 Functions.newsGroupClassifier(svd_transformer,svc,train_data,test_data,'Support Vector Machine')
 
 ########################## END OF E ####################################
