@@ -15,7 +15,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
 
 # Fetching data for 8 specific categories:
-from Project2.Functions import calcPrintResults, cleanDoc, cleaned_data
+from Project2.Functions import calcPrintResults, cleanDoc, cleaned_data, cleaned_datawithDecode
 
 computer_count = 0
 recreational_count = 0
@@ -128,8 +128,8 @@ Functions.printTop10(final_terms, count_vect)
 #Applying LSI to the TF-IDF matrix to reduce to 50 features
 train_data = sklearn.datasets.load_files("20news-bydate-train")
 test_data = sklearn.datasets.load_files("20news-bydate-test")
-train_data=cleaned_data(train_data)
-test_data=cleaned_data(test_data)
+train_data=cleaned_datawithDecode(train_data)
+test_data=cleaned_datawithDecode(test_data)
 svd = TruncatedSVD(n_components=50, n_iter=5, random_state=25)
 svd_transformer = Pipeline([('tfidf', vectorizer),
                             ('svd', svd)])
