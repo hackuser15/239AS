@@ -15,7 +15,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
 
 # Fetching data for 8 specific categories:
-from Project2.Functions import calcPrintResults
+from Project2.Functions import calcPrintResults, cleanDoc
 
 computer_count = 0
 recreational_count = 0
@@ -56,7 +56,7 @@ for i in range(0, no_of_docs):                   #Change this to no_of_docs
 
 
 #Convert to TfIdfVector
-vectorizer = TfidfVectorizer()
+vectorizer = TfidfVectorizer(tokenizer=cleanDoc)
 vectors = vectorizer.fit_transform(train_data.data)
 
 print("Term Count = ",vectors.shape[1])

@@ -32,7 +32,7 @@ def newsGroupMultiClassifier(svd_transformer,classifier_obj,twenty_train,twenty_
 
 def calcPrintResults(twenty_test,predicted,name):
     print("Classification report for classifier %s:\n%s" % (name,metrics.classification_report(twenty_test.target, predicted,target_names=twenty_test.target_names)))
-    print("Accuracy for this classifier:%s\n" % np.mean(predicted == twenty_test.target)*100)
+    print("Accuracy for this classifier:%s\n" % np.mean(predicted == twenty_test.target))
     print("Confusion matrix:\n%s\n" % metrics.confusion_matrix(twenty_test.target, predicted))
 
 
