@@ -93,8 +93,8 @@ def nmfw(X, weights, latent_features, max_iter=100, error_limit=1e-6, fit_error_
     bool_mask = mask.astype(bool)
     print(bool_mask.shape)
     print(mask.shape)
-    for i in range(columns):
-        Y[:,i] = linalg.lstsq(A[bool_mask[:,i],:], X[bool_mask[:,i],i])[0]
+    # for i in range(columns):
+    #     Y[:,i] = linalg.lstsq(A[bool_mask[:,i],:], X[bool_mask[:,i],i])[0]
     Y = np.maximum(Y, eps)
 
     masked_X = mask * X

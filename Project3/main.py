@@ -1,5 +1,7 @@
 # download 100k dataset from http://grouplens.org/datasets/movielens/ and place in project directory
 import os
+from numpy import random
+
 import pandas as pd
 from Project3.Functions import *
 from sklearn.decomposition import NMF
@@ -35,46 +37,78 @@ matrix, weights = convertToMatrix(ratings)
 nz = np.where(matrix>0)
 row = nz[0]
 col = nz[1]
-print(row.shape)
-print(col.shape)
+print(row)
+print(col)
+c = list(zip(row, col))
+random.shuffle(c)
+a, b = zip(*c)
+#
+print(a)
+print(b)
+print(len(a))
+# print(row.shape)
+# print(col.shape)
 #print(matrix[np.where(matrix>0)])
 #print(matrix[np.where(matrix>0)].shape)
 from sklearn.cross_validation import KFold
-kf = KFold(nz[0].shape[0], n_folds=10)
+#kf = KFold(nz[0].shape[0], n_folds=10)
+kf = KFold(len(a), n_folds=10)
 print(len(kf))
 scores = []
 for train_index, test_index in kf:
-    matrix1 = matrix
-    weights1 = weights
+    #matrix1 = matrix
+    weights1 = weights.copy()
     #print("TRAIN:", train_index, "TEST:", test_index)
-    print(train_index.shape)
-    print(test_index.shape)
-    print(row[test_index])
-    print(col[test_index])
-    print(matrix[row[test_index],col[test_index]])
-    print(weights[row[test_index],col[test_index]])
-    matrix[row[test_index],col[test_index]] = 0
-    #weights[row[test_index],col[test_index]] = 0
-    print(matrix[row[test_index],col[test_index]])
-    print(weights[row[test_index],col[test_index]])
-    print(weights.shape)
+    # print(row[test_index])
+    # print(col[test_index])
+    # print("Test")
+    # print(matrix[row[test_index],col[test_index]])
+    # print(weights1[row[test_index],col[test_index]])
+    # #matrix[row[test_index],col[test_index]] = 0
+    weights1[row[test_index],col[test_index]] = 0
+    # print(matrix[row[test_index],col[test_index]])
+    # print(weights1[row[test_index],col[test_index]])
+    # print("Train")
+    # print(matrix[row[train_index],col[train_index]])
+    # print(weights1[row[train_index],col[train_index]])
+    # print(matrix[row[train_index],col[train_index]])
+    # print(weights1[row[train_index],col[train_index]])
     #for index in test_index:
         #weights[index] = 0
-    U, V = nmfw(matrix, weights, 100)
+
+    U, V = nmfw(matrix, weights1, 100)
     res_matrix = np.dot(U, V)
     test_matrix = matrix[row[test_index],col[test_index]]
     test_res_matrix = res_matrix[row[test_index],col[test_index]]
+    print(weights1[row[test_index],col[test_index]])
     print(test_matrix)
     print(test_res_matrix)
-    print(test_matrix.shape)
-    print(test_res_matrix.shape)
-    sum = np.sum(np.abs(np.subtract(test_res_matrix,test_matrix)))
-    print(sum)
-    scores.append(sum)
-    weights = weights1
-    matrix = matrix1
-    #y_train, y_test = y[train_index], y[test_index]
+    train_matrix = matrix[row[train_index],col[train_index]]
+    train_matrix_res = res_matrix[row[train_index],col[train_index]]
+    print(weights1[row[train_index],col[train_index]])
+    print(train_matrix)
+    print(train_matrix_res)
+    sum = np.sum(np.absolute(np.subtract(test_res_matrix,test_matrix)))
+    mean = np.mean(np.absolute(np.subtract(res_matrix,matrix)))
+    meantr = np.mean(np.absolute(np.subtract(train_matrix_res,train_matrix)))
+    mean = np.mean(np.absolute(np.subtract(test_res_matrix,test_matrix)))
+    print(mean)
+    print(meantr)
+    scores.append(mean)
+    #weights = weights1
+    #matrix = matrix1
+print(np.amin(scores))
+print(np.mean(scores))
 
+# precision and recall
+predtest = np.where(test_matrix>3)
+predtest = np.array(predtest)
+print(predtest)
+print(predtest.shape)
+predtestmat = np.where(test_res_matrix>3)
+predtestmat = np.array(predtestmat)
+print(predtestmat.shape)
+print(predtestmat)
 # for k in [10, 50, 100]:
 #     print('k: {}'. format(k))
 #     U, V = nmfw(matrix, weights, k)
