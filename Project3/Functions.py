@@ -1,6 +1,7 @@
 import numpy as np
 from scipy import linalg
 from numpy import dot
+import matplotlib.pyplot as plt
 
 def convertToMatrix(ratings):
     nr = np.max(ratings['user_id'])
@@ -132,3 +133,17 @@ def nmfw(X, weights, latent_features, max_iter=100, error_limit=1e-6, fit_error_
                 break
 
     return A, Y
+
+def plotROC(fpr,tpr,name):
+    plt.figure()
+    plt.plot(fpr, tpr, label='ROC curve', linewidth=10)
+    plt.plot([0, 1], [0, 1], 'k--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('Receiver operating characteristic for %s' %name)
+    #plt.legend(loc="lower right")
+    plt.show()
+    #plt.savefig(name+'.png')
+    #plt.clf()

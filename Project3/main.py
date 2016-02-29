@@ -56,7 +56,7 @@ kf = KFold(len(a), n_folds=10)
 print(len(kf))
 scores = []
 for train_index, test_index in kf:
-    #matrix1 = matrix
+    #matrix1 = matrix.copy()
     weights1 = weights.copy()
     #print("TRAIN:", train_index, "TEST:", test_index)
     # print(row[test_index])
@@ -65,7 +65,10 @@ for train_index, test_index in kf:
     # print(matrix[row[test_index],col[test_index]])
     # print(weights1[row[test_index],col[test_index]])
     # #matrix[row[test_index],col[test_index]] = 0
+
     weights1[row[test_index],col[test_index]] = 0
+    #matrix1[row[test_index],col[test_index]] = 0
+
     # print(matrix[row[test_index],col[test_index]])
     # print(weights1[row[test_index],col[test_index]])
     # print("Train")
@@ -80,19 +83,20 @@ for train_index, test_index in kf:
     res_matrix = np.dot(U, V)
     test_matrix = matrix[row[test_index],col[test_index]]
     test_res_matrix = res_matrix[row[test_index],col[test_index]]
-    print(weights1[row[test_index],col[test_index]])
-    print(test_matrix)
-    print(test_res_matrix)
+    # print(weights1[row[test_index],col[test_index]])
+    # print(test_matrix)
+    # print(test_res_matrix)
     train_matrix = matrix[row[train_index],col[train_index]]
     train_matrix_res = res_matrix[row[train_index],col[train_index]]
-    print(weights1[row[train_index],col[train_index]])
-    print(train_matrix)
-    print(train_matrix_res)
+    # print(weights1[row[train_index],col[train_index]])
+    # print(train_matrix)
+    # print(train_matrix_res)
     sum = np.sum(np.absolute(np.subtract(test_res_matrix,test_matrix)))
-    mean = np.mean(np.absolute(np.subtract(res_matrix,matrix)))
+    meanall = np.mean(np.absolute(np.subtract(res_matrix,matrix)))
     meantr = np.mean(np.absolute(np.subtract(train_matrix_res,train_matrix)))
     mean = np.mean(np.absolute(np.subtract(test_res_matrix,test_matrix)))
     print(mean)
+    print(meanall)
     print(meantr)
     scores.append(mean)
     #weights = weights1
@@ -101,14 +105,38 @@ print(np.amin(scores))
 print(np.mean(scores))
 
 # precision and recall
-predtest = np.where(test_matrix>3)
-predtest = np.array(predtest)
-print(predtest)
-print(predtest.shape)
-predtestmat = np.where(test_res_matrix>3)
-predtestmat = np.array(predtestmat)
-print(predtestmat.shape)
-print(predtestmat)
+print(test_matrix)
+print(test_res_matrix)
+precision = []
+recall = []
+for k in [1, 2, 3, 4]:
+    print(k)
+    print(test_matrix.shape)
+    print(test_res_matrix.shape)
+    predtest = np.where(test_matrix>k)
+    predtest = np.array(predtest)
+    print(predtest)
+    print(predtest.shape)
+    predtestres = np.where(test_res_matrix>k)
+    predtestres = np.array(predtestres)
+    print(predtestres.shape)
+    print(predtestres)
+    c = np.in1d(predtest,predtestres)
+    print(c)
+    intersection = np.count_nonzero(c)
+    prec = intersection/predtestres.shape[1]
+    rec = intersection/predtest.shape[1]
+    print("Precision: %s" % prec)
+    print("Recall: %s" % rec)
+    precision.append(prec)
+    recall.append(rec)
+    print()
+print(precision)
+print(recall)
+plotROC(precision,recall,'ROC')
+#
+# array([ True,  True,  True], dtype=bool)
+
 # for k in [10, 50, 100]:
 #     print('k: {}'. format(k))
 #     U, V = nmfw(matrix, weights, k)
