@@ -53,11 +53,11 @@ for train_index, test_index in kf:
     print("CROSS VALIDATION : %s" %loop_no)
 
     #print("TRAIN:", train_index, "TEST:", test_index)
-    weights = convertToMatrixKF(ratings,train_index)
+    weights_new = convertToMatrixKF(ratings,train_index)
     prec_k = []
     rec_k = []
     #call func
-    U, V = nmfw(matrix, weights, 100)
+    U, V = nmfw(matrix, weights_new, 100)
     res_matrix = np.dot(U, V)
     test_list = []
     test_res_list = []
