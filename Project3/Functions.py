@@ -147,19 +147,19 @@ def nmfw(X, weights, latent_features, max_iter=100, error_limit=1e-6, fit_error_
 
     return A, Y
 
-def plotROC(fpr,tpr,name):
+def plotROC(X,Y,xlabel,ylabel,name):
     plt.figure()
-    plt.plot(fpr, tpr, label='ROC curve', linewidth=2)
+    plt.plot(X, Y, label=name, linewidth=2)
     plt.plot([0, 1], [0, 1], 'k--')
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
-    plt.xlabel('Precision')
-    plt.ylabel('Recall')
-    plt.title('Receiver operating characteristic for %s' %name)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title('Plot %s' %name)
     #plt.legend(loc="lower right")
-    plt.show()
-    #plt.savefig(name+'.png')
-    #plt.clf()
+    #plt.show()
+    plt.savefig(name+'.png')
+    plt.clf()
 
 def weightedRegALS(Q, lambda_, n_factors, W, n_iterations):
     m, n = Q.shape
