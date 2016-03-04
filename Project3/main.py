@@ -30,120 +30,76 @@ ratings = pd.read_csv(abs_ratings_path, sep='\t', names=r_cols)
 # lens = pd.merge(movie_ratings, users)
 
 matrix, weights = convertToMatrix(ratings)
-#print(matrix)
-#print(weights)
-#print(matrix.shape)
-#print(weights.shape)
-nz = np.where(matrix>0)
-row = nz[0]
-col = nz[1]
-print(row)
-print(col)
-c = list(zip(row, col))
-random.shuffle(c)
-a, b = zip(*c)
-#
-print(a)
-print(b)
-print(len(a))
-# print(row.shape)
-# print(col.shape)
-#print(matrix[np.where(matrix>0)])
-#print(matrix[np.where(matrix>0)].shape)
-from sklearn.cross_validation import KFold
-#kf = KFold(nz[0].shape[0], n_folds=10)
-kf = KFold(len(a), n_folds=10)
-print(len(kf))
-scores = []
-for train_index, test_index in kf:
-    #matrix1 = matrix.copy()
-    weights1 = weights.copy()
-    #print("TRAIN:", train_index, "TEST:", test_index)
-    # print(row[test_index])
-    # print(col[test_index])
-    # print("Test")
-    # print(matrix[row[test_index],col[test_index]])
-    # print(weights1[row[test_index],col[test_index]])
-    # #matrix[row[test_index],col[test_index]] = 0
 
-    weights1[row[test_index],col[test_index]] = 0
-    #matrix1[row[test_index],col[test_index]] = 0
-
-    # print(matrix[row[test_index],col[test_index]])
-    # print(weights1[row[test_index],col[test_index]])
-    # print("Train")
-    # print(matrix[row[train_index],col[train_index]])
-    # print(weights1[row[train_index],col[train_index]])
-    # print(matrix[row[train_index],col[train_index]])
-    # print(weights1[row[train_index],col[train_index]])
-    #for index in test_index:
-        #weights[index] = 0
-
-    U, V = nmfw(matrix, weights1, 100)
-    res_matrix = np.dot(U, V)
-    test_matrix = matrix[row[test_index],col[test_index]]
-    test_res_matrix = res_matrix[row[test_index],col[test_index]]
-    # print(weights1[row[test_index],col[test_index]])
-    # print(test_matrix)
-    # print(test_res_matrix)
-    train_matrix = matrix[row[train_index],col[train_index]]
-    train_matrix_res = res_matrix[row[train_index],col[train_index]]
-    # print(weights1[row[train_index],col[train_index]])
-    # print(train_matrix)
-    # print(train_matrix_res)
-    sum = np.sum(np.absolute(np.subtract(test_res_matrix,test_matrix)))
-    meanall = np.mean(np.absolute(np.subtract(res_matrix,matrix)))
-    meantr = np.mean(np.absolute(np.subtract(train_matrix_res,train_matrix)))
-    mean = np.mean(np.absolute(np.subtract(test_res_matrix,test_matrix)))
-    print(mean)
-    print(meanall)
-    print(meantr)
-    scores.append(mean)
-    #weights = weights1
-    #matrix = matrix1
-print(np.amin(scores))
-print(np.mean(scores))
-
-# precision and recall
-print(test_matrix)
-print(test_res_matrix)
-precision = []
-recall = []
-for k in [1, 2, 3, 4]:
-    print(k)
-    print(test_matrix.shape)
-    print(test_res_matrix.shape)
-    predtest = np.where(test_matrix>k)
-    predtest = np.array(predtest)
-    print(predtest)
-    print(predtest.shape)
-    predtestres = np.where(test_res_matrix>k)
-    predtestres = np.array(predtestres)
-    print(predtestres.shape)
-    print(predtestres)
-    c = np.in1d(predtest,predtestres)
-    print(c)
-    intersection = np.count_nonzero(c)
-    prec = intersection/predtestres.shape[1]
-    rec = intersection/predtest.shape[1]
-    print("Precision: %s" % prec)
-    print("Recall: %s" % rec)
-    precision.append(prec)
-    recall.append(rec)
-    print()
-print(precision)
-print(recall)
-plotROC(precision,recall,'ROC')
-#
-# array([ True,  True,  True], dtype=bool)
-
+############QUESTION1
 # for k in [10, 50, 100]:
 #     print('k: {}'. format(k))
 #     U, V = nmfw(matrix, weights, k)
-#     #U, V = nmf(matrix, k)
-#
-# matrix1 = np.dot(U, V)
-# print(matrix1)
-# print(matrix1.shape)
+#     matrix1 = np.dot(U, V)
+#     print(np.mean(np.absolute(np.subtract(matrix1,matrix))))
+    #U, V = nmf(matrix, k)
+
+
 # model = NMF(n_components=10, init='random', random_state=0)
 # model.fit(matrix)
+
+###########QUESTION2
+from sklearn.cross_validation import KFold
+kf = KFold(len(ratings), n_folds=10)
+print(len(kf))
+scores = []
+precision = []
+recall = []
+loop_no = 1
+for train_index, test_index in kf:
+    print("CROSS VALIDATION : %s" %loop_no)
+    loop_no = loop_no + 1
+    #print("TRAIN:", train_index, "TEST:", test_index)
+    weights = convertToMatrixKF(ratings,train_index)
+    #call func
+    U, V = nmfw(matrix, weights, 100)
+    res_matrix = np.dot(U, V)
+    test_list = []
+    test_res_list = []
+    for index in test_index:
+        user = ratings.iloc[index]['user_id']-1
+        movie = ratings.iloc[index]['movie_id']-1
+        test_list.append(matrix[user, movie])
+        test_res_list.append(res_matrix[user, movie])
+    test_matrix = np.array(test_list)
+    test_res_matrix = np.array(test_res_list)
+    # print(test_matrix.shape)
+    # print(test_res_matrix.shape)
+    meanall = np.mean(np.absolute(np.subtract(res_matrix,matrix)))
+    mean = np.mean(np.absolute(np.subtract(test_res_matrix,test_matrix)))
+    print("AVG ERROR IN FULL MATRIX %s:" %meanall)
+    print("AVG ERROR FOR TEST DATA IN THIS FOLD %s:" %mean)
+    scores.append(mean)
+
+    for k in [3, 3.5, 4]:
+        predtest = np.where(test_matrix>k)
+        predtest = np.array(predtest)
+        predtestres = np.where(test_res_matrix>k)
+        predtestres = np.array(predtestres)
+        c = np.in1d(predtest,predtestres)
+        #print(c)
+        intersection = np.count_nonzero(c)
+        #print(predtest.size)
+        #print(predtestres.size)
+        if predtest.size == 0:
+            prec,rec = 0.0,0.0
+        else:
+            prec = intersection/predtestres.size
+            rec = intersection/predtest.size
+        print("Precision: %s" % prec)
+        print("Recall: %s" % rec)
+        precision.append(prec)
+        recall.append(rec)
+print("MIN ERROR IN 10 FOLD %s:" %np.amin(scores))
+print("MAX ERROR IN 10 FOLD %s:" %np.amax(scores))
+print("AVG ERROR IN 10 FOLD %s:" %np.mean(scores))
+print(precision)
+print(recall)
+plotROC(precision,recall,'ROC')
+# print(len(precision))
+# print(len(recall))

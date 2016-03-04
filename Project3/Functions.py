@@ -16,6 +16,19 @@ def convertToMatrix(ratings):
         weights[user, movie] = 1
     return (matrix, weights)
 
+def convertToMatrixKF(ratings,train_index):
+    nr = np.max(ratings['user_id'])
+    nc = np.max(ratings['movie_id'])
+    matrix = np.zeros((nr, nc))
+    weights = np.zeros((nr, nc))
+    for index in train_index:
+        user = ratings.iloc[index]['user_id']-1
+        movie = ratings.iloc[index]['movie_id']-1
+        rating = ratings.iloc[index]['rating']
+        #matrix[user, movie] = rating
+        weights[user, movie] = 1
+    return weights
+
 
 def nmf(X, latent_features, max_iter=100, error_limit=1e-6, fit_error_limit=1e-6):
     """
@@ -80,6 +93,7 @@ def nmfw(X, weights, latent_features, max_iter=100, error_limit=1e-6, fit_error_
     Decompose X to A*Y
     """
     eps = 1e-5
+
     print('Starting NMF decomposition with {} latent features and {} iterations.'.format(latent_features, max_iter))
     # X = X.toarray()  # I am passing in a scipy sparse matrix
 
@@ -92,8 +106,7 @@ def nmfw(X, weights, latent_features, max_iter=100, error_limit=1e-6, fit_error_
 
     Y = linalg.lstsq(A, X)[0]
     bool_mask = mask.astype(bool)
-    print(bool_mask.shape)
-    print(mask.shape)
+
     # for i in range(columns):
     #     Y[:,i] = linalg.lstsq(A[bool_mask[:,i],:], X[bool_mask[:,i],i])[0]
     Y = np.maximum(Y, eps)
@@ -136,14 +149,36 @@ def nmfw(X, weights, latent_features, max_iter=100, error_limit=1e-6, fit_error_
 
 def plotROC(fpr,tpr,name):
     plt.figure()
-    plt.plot(fpr, tpr, label='ROC curve', linewidth=10)
+    plt.plot(fpr, tpr, label='ROC curve', linewidth=2)
     plt.plot([0, 1], [0, 1], 'k--')
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
+    plt.xlabel('Precision')
+    plt.ylabel('Recall')
     plt.title('Receiver operating characteristic for %s' %name)
     #plt.legend(loc="lower right")
     plt.show()
     #plt.savefig(name+'.png')
     #plt.clf()
+
+def weightedRegALS(Q, lambda_, n_factors, W, n_iterations):
+    m, n = Q.shape
+
+    X = 5 * np.random.rand(m, n_factors)
+    Y = np.linalg.lstsq(X, Q)[0]
+
+    weighted_errors = []
+    totalError =0
+    for ii in range(n_iterations):
+        for u, Wu in enumerate(W):
+            X[u] = np.linalg.solve(np.dot(Y, np.dot(np.diag(Wu), Y.T)) + lambda_ * np.eye(n_factors),
+                                   np.dot(Y, np.dot(np.diag(Wu), Q[u].T))).T
+        for i, Wi in enumerate(W.T):
+            Y[:,i] = np.linalg.solve(np.dot(X.T, np.dot(np.diag(Wi), X)) + lambda_ * np.eye(n_factors),
+                                     np.dot(X.T, np.dot(np.diag(Wi), Q[:, i])))
+        # weighted_errors.append(get_error(Q, X, Y, W))
+        # totalError += get_error(Q, X, Y, W)
+        if(ii == n_iterations - 1):
+            print('Total Error {}'.format(totalError))
+    weighted_Q_hat = np.dot(X,Y)
+    return weighted_Q_hat
