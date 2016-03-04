@@ -33,12 +33,12 @@ matrix, weights = convertToMatrix(ratings)
 
 ############QUESTION1
 print('-------------------Q. 1--------------------')
-# for k in [10, 50, 100]:
-#     print('k: {}'. format(k))
-#     U, V = nmfw(matrix, weights, k)
-#     matrix1 = np.dot(U, V)
-#     print(np.mean(np.absolute(np.subtract(matrix1,matrix))))
-    #U, V = nmf(matrix, k)
+for k in [10, 50, 100]:
+    print('k: {}'. format(k))
+    U, V = nmfw(matrix, weights, k)
+    matrix1 = np.dot(U, V)
+    print(np.mean(np.absolute(np.subtract(matrix1,matrix))))
+    U, V = nmf(matrix, k)
 
 
 # model = NMF(n_components=10, init='random', random_state=0)
