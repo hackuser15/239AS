@@ -32,6 +32,7 @@ ratings = pd.read_csv(abs_ratings_path, sep='\t', names=r_cols)
 matrix, weights = convertToMatrix(ratings)
 
 ############QUESTION1
+print('-------------------Q. 1--------------------')
 # for k in [10, 50, 100]:
 #     print('k: {}'. format(k))
 #     U, V = nmfw(matrix, weights, k)
@@ -44,6 +45,7 @@ matrix, weights = convertToMatrix(ratings)
 # model.fit(matrix)
 
 ###########QUESTION2
+print('-------------------Q. 2 & 3--------------------')
 from sklearn.cross_validation import KFold
 kf = KFold(len(ratings), n_folds=10)
 print(len(kf))
@@ -53,9 +55,11 @@ recall = []
 loop_no = 1
 for train_index, test_index in kf:
     print("CROSS VALIDATION : %s" %loop_no)
-    loop_no = loop_no + 1
+
     #print("TRAIN:", train_index, "TEST:", test_index)
     weights = convertToMatrixKF(ratings,train_index)
+    prec_k = []
+    rec_k = []
     #call func
     U, V = nmfw(matrix, weights, 100)
     res_matrix = np.dot(U, V)
@@ -93,20 +97,24 @@ for train_index, test_index in kf:
             rec = intersection/predtest.size
         print("Precision: %s" % prec)
         print("Recall: %s" % rec)
+        prec_k.append(prec)
+        rec_k.append(rec)
         precision.append(prec)
         recall.append(rec)
+    plotROC(prec_k,rec_k,'ROC_NoReg_Fold_'+str(loop_no))
+    loop_no = loop_no + 1
 print("MIN ERROR IN 10 FOLD %s:" %np.amin(scores))
 print("MAX ERROR IN 10 FOLD %s:" %np.amax(scores))
 print("AVG ERROR IN 10 FOLD %s:" %np.mean(scores))
 print(precision)
 print(recall)
-plotROC(precision,recall,'ROC')
+plotROC(precision,recall,'ROC_NoReg_Final')
 # print(len(precision))
 # print(len(recall))
 
 #Q4
 R_new, W_new = weights, matrix
-
+print('-------------------Q. 4--------------------')
 for k in [10, 50, 100]:
     print('k: {}'. format(k))
     U, V = nmfw(R_new, W_new, k)
