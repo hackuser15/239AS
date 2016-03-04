@@ -140,8 +140,10 @@ def nmfw(X, weights, latent_features, max_iter=100, error_limit=1e-6, fit_error_
             X_est_prev = X_est
 
             curRes = linalg.norm(mask * (X - X_est), ord='fro')
+            abs = np.mean(np.absolute(np.subtract(X,X_est)))
             # print('fit residual', np.round(fit_residual, 4))
             print('Total Squared error', np.round(curRes**2, 4))
+            print('Mean Absolute error', np.round(abs, 4))
             if curRes < error_limit or fit_residual < fit_error_limit:
                 break
 

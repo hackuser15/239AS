@@ -36,10 +36,6 @@ print('-------------------Q. 1--------------------')
 for k in [10, 50, 100]:
     print('k: {}'. format(k))
     U, V = nmfw(matrix, weights, k)
-    matrix1 = np.dot(U, V)
-    print(np.mean(np.absolute(np.subtract(matrix1,matrix))))
-    U, V = nmf(matrix, k)
-
 
 # model = NMF(n_components=10, init='random', random_state=0)
 # model.fit(matrix)
@@ -80,7 +76,7 @@ for train_index, test_index in kf:
     print("AVG ERROR FOR TEST DATA IN THIS FOLD %s:" %mean)
     scores.append(mean)
 
-    for k in [3, 3.5, 4]:
+    for k in [1, 1.5, 2, 2.5, 3, 3.5, 4]:
         predtest = np.where(test_matrix>k)
         predtest = np.array(predtest)
         predtestres = np.where(test_res_matrix>k)
@@ -162,7 +158,7 @@ for train_index, test_index in kf:
     print("AVG ERROR FOR TEST DATA IN THIS FOLD %s:" %mean)
     scores.append(mean)
 
-    for k in [3, 3.5, 4]:
+    for k in [1, 1.5, 2, 2.5, 3, 3.5, 4]:
         predtest = np.where(test_matrix>k)
         predtest = np.array(predtest)
         predtestres = np.where(test_res_matrix>k)
