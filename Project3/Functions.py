@@ -187,4 +187,4 @@ def get_error(R_hat, R, W):
 
 def get_abs_error(R_hat, R, W):
     tmp = W *np.abs(R_hat - R)
-    return np.mean(tmp[R > 0.0])
+    return np.mean(tmp[W > 0.0])

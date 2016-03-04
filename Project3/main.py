@@ -130,11 +130,12 @@ for train_index, test_index in kf:
     print("CROSS VALIDATION : %s" %loop_no)
     #print("TRAIN:", train_index, "TEST:", test_index)
     weights = convertToMatrixKF(ratings,train_index)
+    matrix_new = matrix[weights > 0.0]
     prec_k = []
     rec_k = []
     #call func
 
-    U, V = weightedRegALS(weights, lambda_, k, matrix, n_iterations)
+    U, V = weightedRegALS(weights, lambda_, k, matrix_new, n_iterations)
     res_matrix = np.dot(U, V)
     test_list = []
     test_res_list = []
