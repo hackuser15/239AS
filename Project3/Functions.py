@@ -140,8 +140,8 @@ def nmfw(X, weights, latent_features, max_iter=100, error_limit=1e-6, fit_error_
             X_est_prev = X_est
 
             curRes = linalg.norm(mask * (X - X_est), ord='fro')
-            print('fit residual', np.round(fit_residual, 4))
-            print('total residual', np.round(curRes, 4))
+            # print('fit residual', np.round(fit_residual, 4))
+            print('total residual', np.round(curRes**2, 4))
             if curRes < error_limit or fit_residual < fit_error_limit:
                 break
 
@@ -176,9 +176,15 @@ def weightedRegALS(Q, lambda_, n_factors, W, n_iterations):
         for i, Wi in enumerate(W.T):
             Y[:,i] = np.linalg.solve(np.dot(X.T, np.dot(np.diag(Wi), X)) + lambda_ * np.eye(n_factors),
                                      np.dot(X.T, np.dot(np.diag(Wi), Q[:, i])))
-        # weighted_errors.append(get_error(Q, X, Y, W))
-        # totalError += get_error(Q, X, Y, W)
         if(ii == n_iterations - 1):
-            print('Total Error {}'.format(totalError))
+            print('Total Error {}'.format(get_error(np.dot(X, Y), Q, W)))
+            print('Absolute Error {}'.format(get_abs_error(np.dot(X, Y), Q, W)))
     weighted_Q_hat = np.dot(X,Y)
     return weighted_Q_hat
+
+def get_error(R_hat, R, W):
+    return np.sum((W * (R_hat - R))**2)
+
+def get_abs_error(R_hat, R, W):
+    tmp = W *np.abs(R_hat - R)
+    return np.mean(tmp[tmp > 0.0])
