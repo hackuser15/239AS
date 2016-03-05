@@ -4,30 +4,22 @@ from numpy import random
 
 import pandas as pd
 from Project3.Functions import *
-from sklearn.decomposition import NMF
+import time
+start_time = time.time()
 
 script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
-# user_path = "ml-100k/u.user"
-# abs_user_path = os.path.join(script_dir, user_path)
-# pass in column names for each CSV
-# u_cols = ['user_id', 'age', 'sex', 'occupation', 'zip_code']
-# users = pd.read_csv(abs_user_path, sep='|', names=u_cols)
 
 ratings_path = "ml-100k/u.data"
 abs_ratings_path = os.path.join(script_dir, ratings_path)
 r_cols = ['user_id', 'movie_id', 'rating', 'unix_timestamp']
 ratings = pd.read_csv(abs_ratings_path, sep='\t', names=r_cols)
-#print(ratings)
 
-# the movies file contains columns indicating the movie's genres
-# movies_path = "ml-100k/u.item"
-# abs_movies_path = os.path.join(script_dir, movies_path)
-# m_cols = ['movie_id', 'title', 'release_date', 'video_release_date', 'imdb_url']
-# movies = pd.read_csv(abs_movies_path, sep='|', names=m_cols, encoding = "ISO-8859-1")
-
-# create one merged DataFrame
-# movie_ratings = pd.merge(movies, ratings)
-# lens = pd.merge(movie_ratings, users)
+#the movies file contains columns indicating the movie's genres
+movies_path = "ml-100k/u.item"
+abs_movies_path = os.path.join(script_dir, movies_path)
+m_cols = ['movie_id', 'title', 'release_date', 'video_release_date', 'imdb_url']
+#m_cols = ['movie_id', 'title']
+movies = pd.read_csv(abs_movies_path, sep='\t', names=m_cols, encoding = "ISO-8859-1")
 
 matrix, weights = convertToMatrix(ratings)
 
@@ -37,8 +29,7 @@ for k in [10, 50, 100]:
     print('k: {}'. format(k))
     U, V = nmfw(matrix, weights, k)
 
-
-###########QUESTION2
+##########QUESTION2
 print('-------------------Q. 2 & 3--------------------')
 from sklearn.cross_validation import KFold
 kf = KFold(len(ratings), n_folds=10)
@@ -104,12 +95,10 @@ print("AVG ERROR IN 10 FOLD %s:" %np.mean(scores))
 print("Average Precision over 10 folds:%s" % (np.mean(precision)))
 print("Average Recall over 10 folds:%s" % (np.mean(recall)))
 plotROC(recall,precision,'Recall','Precision','ROC_NoReg_Final')
-print(len(precision))
-print(len(recall))
 
 #Q4
 R_new, W_new = weights, matrix
-print('-------------------Q. 4--------------------')
+print('-------------------Q. 4 & 5--------------------')
 for k in [10, 50, 100]:
     print('k: {}'. format(k))
     U, V = nmfw(R_new, W_new, k)
@@ -117,7 +106,8 @@ for k in [10, 50, 100]:
 
 k = 100
 n_iterations = 20
-for lambda_ in [0.01, 0.1, 1]:
+# for lambda_ in [0.01, 0.1, 1]:
+for lambda_ in [1]:
     print('lambda: {}'. format(lambda_))
     R_hat = weightedRegALS(R_new, lambda_, k, W_new, n_iterations)
 
@@ -133,11 +123,13 @@ for train_index, test_index in kf:
     print("CROSS VALIDATION : %s" %loop_no)
     #print("TRAIN:", train_index, "TEST:", test_index)
     weights_new, matrix_new = convertToMatrixKF(ratings,train_index)
+    _, matrix_test = convertToMatrixKF(ratings,test_index)
     prec_k = []
     rec_k = []
 
     res_matrix = weightedRegALS(weights_new, lambda_, k, matrix_new, n_iterations)
     res_matrix = res_matrix*matrix;
+    res_matrix_test = res_matrix*matrix_test;
     test_list = []
     test_res_list = []
     for index in test_index:
@@ -174,18 +166,18 @@ for train_index, test_index in kf:
     hit_rate = []
     L = 5.0
     for ind in range(0,res_matrix.shape[0]):
-        movie_id = matrix[ind].argsort()[::-1][:L]
-        movie_id_res = res_matrix[ind].argsort()[::-1][:L]
-
+        movie_id = matrix_test[ind].argsort()[::-1][:L]
+        movie_id_res = res_matrix_test[ind].argsort()[::-1][:L]
+        if(np.count_nonzero(matrix_test[movie_id]) == 0):
+            continue
         c = np.in1d(movie_id,movie_id_res)
         intersection = np.count_nonzero(c)
         hit = intersection/L
         hit_rate.append(hit)
         hit_rate_total.append(hit)
-        print(hit_rate)
     print("L=%s Fold:%s Average Precision:%s" % (L,loop_no,np.mean(hit_rate)))
-    if(loop_no==5):
-        break
+    # if(loop_no==5):
+        # break
     loop_no = loop_no + 1
 print("MIN ERROR %s:" %np.amin(scores))
 print("MAX ERROR %s:" %np.amax(scores))
@@ -194,3 +186,24 @@ print("Average Precision all folds:%s" % (np.mean(precision)))
 print("Average Recall over all folds:%s" % (np.mean(recall)))
 print("Average Precision for top 5 recommendations over all folds:%s" % (np.mean(hit_rate_total)))
 plotROC(recall,precision,'Recall','Precision','ROC_Regularized_Final')
+
+res_matrix = R_hat * matrix
+print("Recommended movie list for each user (Top 5)")
+for L in range(1,6):
+    hit_rate = []
+    false_rate = []
+    for ind in range(0,res_matrix.shape[0]):
+        movie_id = matrix[ind].argsort()[::-1][:L]
+        movie_id_res = res_matrix[ind].argsort()[::-1][:L]
+        if L == 5.0:
+            print("User ID: %s" %(ind+1))
+            print(movies.ix[movie_id_res+1]['title'])
+        c = np.in1d(movie_id,movie_id_res)
+        intersection = np.count_nonzero(c)
+        hit = intersection/L
+        false = 1-(intersection/L)
+        hit_rate.append(hit)
+        false_rate.append(false)
+    plotROC(false_rate,hit_rate,'False-Rate','Hit-Rate','False vs Hit for L='+str(L))
+
+print("--- %s seconds ---" % (time.time() - start_time))
