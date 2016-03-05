@@ -42,8 +42,7 @@ for train_index, test_index in kf:
     weights_new,_ = convertToMatrixKF(ratings,train_index)
     prec_k = []
     rec_k = []
-    # n_fav_movies = []
-    #call func
+
     U, V = nmfw(matrix, weights_new, 100)
     res_matrix = np.dot(U, V)
     test_list = []
@@ -55,11 +54,8 @@ for train_index, test_index in kf:
         test_res_list.append(res_matrix[user, movie])
     test_matrix = np.array(test_list)
     test_res_matrix = np.array(test_res_list)
-    # print(test_matrix.shape)
-    # print(test_res_matrix.shape)
     meanall = np.mean(np.absolute(np.subtract(res_matrix,matrix)))
     mean = np.mean(np.absolute(np.subtract(test_res_matrix,test_matrix)))
-    # print("AVG ERROR IN FULL MATRIX %s:" %meanall)
     print("AVG ERROR FOR TEST DATA IN THIS FOLD %s:" %mean)
     scores.append(mean)
 
@@ -76,8 +72,6 @@ for train_index, test_index in kf:
         else:
             prec = intersection/predtestres.size
             rec = intersection/predtest.size
-        # print("Precision: %s" % prec)
-        # print("Recall: %s" % rec)
         prec_k.append(prec)
         rec_k.append(rec)
         precision.append(prec)
@@ -110,7 +104,7 @@ for lambda_ in [0.01, 0.1, 1]:
     print('lambda: {}'. format(lambda_))
     R_hat = weightedRegALS(R_new, lambda_, k, W_new, n_iterations)
 
-lambda_ = 0.1
+lambda_ = 0.01
 from sklearn.cross_validation import KFold
 kf = KFold(len(ratings), n_folds=10)
 scores = []
@@ -120,7 +114,6 @@ hit_rate_total = []
 loop_no = 1
 for train_index, test_index in kf:
     print("CROSS VALIDATION : %s" %loop_no)
-    #print("TRAIN:", train_index, "TEST:", test_index)
     weights_new, matrix_new = convertToMatrixKF(ratings,train_index)
     _, matrix_test = convertToMatrixKF(ratings,test_index)
     prec_k = []
@@ -182,9 +175,9 @@ for train_index, test_index in kf:
 print("MIN ERROR %s:" %np.amin(scores))
 print("MAX ERROR %s:" %np.amax(scores))
 print("AVG ERROR %s:" %np.mean(scores))
-print("Average Precision all folds:%s" % (np.mean(precision)))
-print("Average Recall over all folds:%s" % (np.mean(recall)))
-print("Average Precision for top 5 recommendations over all folds:%s" % (np.mean(hit_rate_total)))
+print("Average Precision 10 folds:%s" % (np.mean(precision)))
+print("Average Recall over 10 folds:%s" % (np.mean(recall)))
+print("Average Precision for top 5 recommendations over 10 folds:%s" % (np.mean(hit_rate_total)))
 plotROC(recall,precision,'Recall','Precision','ROC_Regularized_Final')
 
 res_matrix = R_hat * matrix
