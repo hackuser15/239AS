@@ -51,6 +51,7 @@ for train_index, test_index in kf:
     weights_new,_ = convertToMatrixKF(ratings,train_index)
     prec_k = []
     rec_k = []
+    # n_fav_movies = []
     #call func
     U, V = nmfw(matrix, weights_new, 100)
     res_matrix = np.dot(U, V)
@@ -67,7 +68,7 @@ for train_index, test_index in kf:
     # print(test_res_matrix.shape)
     meanall = np.mean(np.absolute(np.subtract(res_matrix,matrix)))
     mean = np.mean(np.absolute(np.subtract(test_res_matrix,test_matrix)))
-    print("AVG ERROR IN FULL MATRIX %s:" %meanall)
+    # print("AVG ERROR IN FULL MATRIX %s:" %meanall)
     print("AVG ERROR FOR TEST DATA IN THIS FOLD %s:" %mean)
     scores.append(mean)
 
@@ -77,28 +78,31 @@ for train_index, test_index in kf:
         predtestres = np.where(test_res_matrix>k)
         predtestres = np.array(predtestres)
         c = np.in1d(predtest,predtestres)
-        #print(c)
+
         intersection = np.count_nonzero(c)
-        #print(predtest.size)
-        #print(predtestres.size)
         if predtest.size == 0:
             prec,rec = 0.0,0.0
         else:
             prec = intersection/predtestres.size
             rec = intersection/predtest.size
-        print("Precision: %s" % prec)
-        print("Recall: %s" % rec)
+        # print("Precision: %s" % prec)
+        # print("Recall: %s" % rec)
         prec_k.append(prec)
         rec_k.append(rec)
         precision.append(prec)
         recall.append(rec)
+        # n_fav_movies.append(intersection)
+        if(k==4):
+            print("Fold:%s Number of movies liked:%s" % (loop_no,intersection))
     plotROC(rec_k,prec_k,'Recall','Precision','ROC_NoReg_Fold_'+str(loop_no))
+    print("Fold:%s Average Precision:%s" % (loop_no,np.mean(prec_k)))
+    print("Fold:%s Average Recall:%s" % (loop_no,np.mean(rec_k)))
     loop_no = loop_no + 1
 print("MIN ERROR IN 10 FOLD %s:" %np.amin(scores))
 print("MAX ERROR IN 10 FOLD %s:" %np.amax(scores))
 print("AVG ERROR IN 10 FOLD %s:" %np.mean(scores))
-print(precision)
-print(recall)
+print("Average Precision over 10 folds:%s" % (np.mean(precision)))
+print("Average Recall over 10 folds:%s" % (np.mean(recall)))
 plotROC(recall,precision,'Recall','Precision','ROC_NoReg_Final')
 print(len(precision))
 print(len(recall))
@@ -120,10 +124,10 @@ for lambda_ in [0.01, 0.1, 1]:
 lambda_ = 0.1
 from sklearn.cross_validation import KFold
 kf = KFold(len(ratings), n_folds=10)
-# print(len(kf))
 scores = []
 precision = []
 recall = []
+hit_rate_total = []
 loop_no = 1
 for train_index, test_index in kf:
     print("CROSS VALIDATION : %s" %loop_no)
@@ -145,7 +149,7 @@ for train_index, test_index in kf:
     test_res_matrix = np.array(test_res_list)
     meanall = np.mean(np.absolute(np.subtract(res_matrix,matrix)))
     mean = np.mean(np.absolute(np.subtract(test_res_matrix,test_matrix)))
-    print("AVG ERROR IN FULL MATRIX %s:" %meanall)
+    # print("AVG ERROR IN FULL MATRIX %s:" %meanall)
     print("AVG ERROR FOR TEST DATA IN THIS FOLD %s:" %mean)
     scores.append(mean)
 
@@ -161,17 +165,32 @@ for train_index, test_index in kf:
         else:
             prec = intersection/predtestres.size
             rec = intersection/predtest.size
-        print("Precision: %s" % prec)
-        print("Recall: %s" % rec)
         prec_k.append(prec)
         rec_k.append(rec)
         precision.append(prec)
         recall.append(rec)
     plotROC(rec_k,prec_k,'Recall','Precision','ROC_Regularized_Fold_'+str(loop_no))
+
+    hit_rate = []
+    L = 5.0
+    for ind in range(0,res_matrix.shape[0]):
+        movie_id = matrix[ind].argsort()[::-1][:L]
+        movie_id_res = res_matrix[ind].argsort()[::-1][:L]
+
+        c = np.in1d(movie_id,movie_id_res)
+        intersection = np.count_nonzero(c)
+        hit = intersection/L
+        hit_rate.append(hit)
+        hit_rate_total.append(hit)
+        print(hit_rate)
+    print("L=%s Fold:%s Average Precision:%s" % (L,loop_no,np.mean(hit_rate)))
+    if(loop_no==5):
+        break
     loop_no = loop_no + 1
-print("MIN ERROR IN 10 FOLD %s:" %np.amin(scores))
-print("MAX ERROR IN 10 FOLD %s:" %np.amax(scores))
-print("AVG ERROR IN 10 FOLD %s:" %np.mean(scores))
-print(precision)
-print(recall)
+print("MIN ERROR %s:" %np.amin(scores))
+print("MAX ERROR %s:" %np.amax(scores))
+print("AVG ERROR %s:" %np.mean(scores))
+print("Average Precision all folds:%s" % (np.mean(precision)))
+print("Average Recall over all folds:%s" % (np.mean(recall)))
+print("Average Precision for top 5 recommendations over all folds:%s" % (np.mean(hit_rate_total)))
 plotROC(recall,precision,'Recall','Precision','ROC_Regularized_Final')
