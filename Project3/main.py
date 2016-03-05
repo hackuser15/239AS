@@ -164,6 +164,8 @@ for train_index, test_index in kf:
         precision.append(prec)
         recall.append(rec)
     plotROC(rec_k,prec_k,'Recall','Precision','ROC_Regularized_Fold_'+str(loop_no))
+    print("Fold:%s Average Precision:%s" % (loop_no,np.mean(prec_k)))
+    print("Fold:%s Average Recall:%s" % (loop_no,np.mean(rec_k)))
 
     hit_rate = []
     L = 5.0
