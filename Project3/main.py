@@ -29,7 +29,7 @@ for k in [10, 50, 100]:
     print('k: {}'. format(k))
     U, V = nmfw(matrix, weights, k)
 
-##########QUESTION2
+########## QUESTION2 and 3
 print('-------------------Q. 2 & 3--------------------')
 from sklearn.cross_validation import KFold
 kf = KFold(len(ratings), n_folds=10)
@@ -96,7 +96,7 @@ print("Average Precision over 10 folds:%s" % (np.mean(precision)))
 print("Average Recall over 10 folds:%s" % (np.mean(recall)))
 plotROC(recall,precision,'Recall','Precision','ROC_NoReg_Final')
 
-#Q4
+#Q4 and 5
 R_new, W_new = weights, matrix
 print('-------------------Q. 4 & 5--------------------')
 for k in [10, 50, 100]:
@@ -127,8 +127,7 @@ for train_index, test_index in kf:
     rec_k = []
 
     res_matrix = weightedRegALS(weights_new, lambda_, k, matrix_new, n_iterations)
-    # U, V = nmfw(weights_new, matrix_new,100)
-    # res_matrix = np.dot(U,V)
+
     res_matrix = res_matrix*matrix
     res_matrix_test = res_matrix*matrix_test
     test_list = []
@@ -142,7 +141,6 @@ for train_index, test_index in kf:
     test_res_matrix = np.array(test_res_list)
     meanall = np.mean(np.absolute(np.subtract(res_matrix,matrix)))
     mean = np.mean(np.absolute(np.subtract(test_res_matrix,test_matrix)))
-    # print("AVG ERROR IN FULL MATRIX %s:" %meanall)
     print("AVG ERROR FOR TEST DATA IN THIS FOLD %s:" %mean)
     scores.append(mean)
 
@@ -179,8 +177,7 @@ for train_index, test_index in kf:
         hit_rate.append(hit)
         hit_rate_total.append(hit)
     print("L=%s Fold:%s Average Precision:%s" % (L,loop_no,np.mean(hit_rate)))
-    # if(loop_no==5):
-        # break
+
     loop_no = loop_no + 1
 print("MIN ERROR %s:" %np.amin(scores))
 print("MAX ERROR %s:" %np.amax(scores))
