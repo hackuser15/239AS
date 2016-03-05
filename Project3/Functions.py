@@ -30,17 +30,10 @@ def convertToMatrixKF(ratings,train_index):
     return weights, matrix
 
 def nmfw(X, weights, latent_features, max_iter=100, error_limit=1e-6, fit_error_limit=1e-6):
-    """
-    Decompose X to A*Y
-    """
     eps = 1e-5
 
-    print('Starting NMF decomposition with {} latent features and {} iterations.'.format(latent_features, max_iter))
-    # X = X.toarray()  # I am passing in a scipy sparse matrix
-
-    # mask
     mask = weights
-    # initial matrices. A is random [0,1] and Y is A\X.
+
     rows, columns = X.shape
     A = np.random.rand(rows, latent_features)
     A = np.maximum(A, eps)
@@ -48,33 +41,22 @@ def nmfw(X, weights, latent_features, max_iter=100, error_limit=1e-6, fit_error_
     Y = linalg.lstsq(A, X)[0]
     bool_mask = mask.astype(bool)
 
-    # for i in range(columns):
-    #     Y[:,i] = linalg.lstsq(A[bool_mask[:,i],:], X[bool_mask[:,i],i])[0]
     Y = np.maximum(Y, eps)
 
     masked_X = mask * X
     X_est_prev = dot(A, Y)
     for i in range(1, max_iter + 1):
-        # ===== updates =====
-        # Matlab: A=A.*(((W.*X)*Y')./((W.*(A*Y))*Y'));
         top = dot(masked_X, Y.T)
         bottom = (dot((mask * dot(A, Y)), Y.T)) + eps
         A *= top / bottom
 
         A = np.maximum(A, eps)
-        # print 'A',  np.round(A, 2)
-
-        # Matlab: Y=Y.*((A'*(W.*X))./(A'*(W.*(A*Y))));
         top = dot(A.T, masked_X)
         bottom = dot(A.T, mask * dot(A, Y)) + eps
         Y *= top / bottom
         Y = np.maximum(Y, eps)
-        # print 'Y', np.round(Y, 2)
 
-
-        # ==== evaluation ====
         if i == max_iter:
-            # print('Iteration {}:'.format(i))
             X_est = dot(A, Y)
             err = mask * (X_est_prev - X_est)
             fit_residual = np.sqrt(np.sum(err ** 2))
@@ -82,7 +64,6 @@ def nmfw(X, weights, latent_features, max_iter=100, error_limit=1e-6, fit_error_
 
             curRes = linalg.norm(mask * (X - X_est), ord='fro')
             abs = np.mean(mask*np.absolute(np.subtract(X,X_est)))
-            # print('fit residual', np.round(fit_residual, 4))
             print('Total Squared error', np.round(curRes**2, 4))
             print('Mean Absolute error', np.round(abs, 4))
             if curRes < error_limit or fit_residual < fit_error_limit:
@@ -110,8 +91,6 @@ def weightedRegALS(Q, lambda_, n_factors, W, n_iterations):
     X = 5 * np.random.rand(m, n_factors)
     Y = np.linalg.lstsq(X, Q)[0]
 
-    weighted_errors = []
-    totalError =0
     for ii in range(n_iterations):
         for u, Wu in enumerate(W):
             X[u] = np.linalg.solve(np.dot(Y, np.dot(np.diag(Wu), Y.T)) + lambda_ * np.eye(n_factors),
