@@ -69,7 +69,7 @@ def plotHistogram(tweetTimeDict, hashtag):
 
         cur += timedelta(hours=1)
 
-    # plt.figure(figsize=(20, 8))
+    plt.figure(figsize=(20, 8))
     plt.title("Number of Tweets per hour for #" + hashtag)
     plt.ylabel("Number of tweets")
     plt.xlabel("Timeline")
