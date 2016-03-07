@@ -35,11 +35,11 @@ def getHashTagStats(hashtag):
         if hashtag in ('nfl','superbowl'):
             tweet_time = tweet['firstpost_date']
             tweet_time = datetime.datetime.fromtimestamp(tweet_time)
-            time_key = datetime.datetime(tweet_time.year, tweet_time.month, tweet_time.day, tweet_time.hour, 0, 0)
-            if time_key not in d:
-                d[time_key] = 1
+            hour_key = datetime.datetime(tweet_time.year, tweet_time.month, tweet_time.day, tweet_time.hour, 0, 0)
+            if hour_key not in d:
+                d[hour_key] = 1
             else:
-                d[time_key] += 1
+                d[hour_key] += 1
     print('-----------------------------------------')
     print('Statistics for %s:'%hashtag)
     print('-----------------------------------------')
@@ -80,3 +80,44 @@ def plotHistogram(tweetTimeDict, hashtag):
     plt.xlabel("Timeline")
     plt.bar(range(len(tweets_per_hour)), tweets_per_hour, width=1.5, color='b')
     plt.savefig('Histogram_#'+hashtag+'.png')
+
+
+def genTrainData(hashtag):
+    tweet_path = "tweet_data/tweets_#" + hashtag + ".txt"
+    abs_tweet_path = os.path.join(script_dir, tweet_path)
+
+    train_data = []
+    train_label = []
+    firstIteration = True
+    # Tweet count, Retweet count, Followers Count, Max Followers, Time
+    r = [0, 0, 0, 0, -1]
+    for line in open(abs_tweet_path, encoding="utf8"):
+        tweet = json.loads(line)
+        retweets = tweet['metrics']['citations']['data'][0]['citations']
+        followers = tweet['author']['followers']
+        tweet_time = tweet['firstpost_date']
+        tweet_time = datetime.datetime.fromtimestamp(tweet_time)
+        hour_key = datetime.datetime(tweet_time.year, tweet_time.month, tweet_time.day, tweet_time.hour, 0, 0)
+
+        if firstIteration==True:
+            cur_hour = hour_key
+            firstIteration = False
+        while(cur_hour != hour_key):
+            train_data.append(r)
+            train_label.append(r[0])
+            cur_hour += timedelta(hours=1)
+            r = [0, 0, 0, 0, cur_hour.hour]
+
+        r[0] += 1                                       #Tweet count
+        r[1] += retweets                                #Number of retweets
+        r[2] += followers                               #Number of Followers
+        r[3] = followers if followers > r[3] else r[3]  #Max Followers
+        r[4] = hour_key.hour                            #Hour of Day
+    train_data.append(r)
+    train_label.append(r[0])
+    train_data = np.array(train_data)
+    train_label = np.array(train_label)
+    train_label = np.roll(train_label, -1)
+    train_data = train_data[0:-1,:]
+    train_label = train_label[0:-1]
+    return train_data, train_label
