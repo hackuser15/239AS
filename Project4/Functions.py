@@ -47,11 +47,6 @@ def getHashTagStats(hashtag):
     print('Last tweet time: '+ end_time.strftime('%Y-%m-%d %H:%M:%S'))
     n_hours = int((end_time - start_time).total_seconds()/3600 + 0.5)
 
-    # print("total number of hours: ", n_hours)
-    # print("total number of users posting this hashtag: ", len(user_ids))
-    # print("total number of tweets containing this hashtag: ", n_tweets)
-    # print("total number of retweets: ", n_retweets)
-
     print("Average number of tweets per hour: ", n_tweets/n_hours)
     print("Average number of followers of users posting the tweets: ", n_followers/len(user_ids))
     print("Average number of retweets: ", n_retweets/n_tweets)
@@ -74,7 +69,7 @@ def plotHistogram(tweetTimeDict, hashtag):
 
         cur += timedelta(hours=1)
 
-    plt.figure(figsize=(20, 8))
+    # plt.figure(figsize=(20, 8))
     plt.title("Number of Tweets per hour for #" + hashtag)
     plt.ylabel("Number of tweets")
     plt.xlabel("Timeline")
@@ -82,7 +77,7 @@ def plotHistogram(tweetTimeDict, hashtag):
     plt.savefig('Histogram_#'+hashtag+'.png')
 
 
-def genTrainData(hashtag):
+def genTrainingData(hashtag):
     tweet_path = "tweet_data/tweets_#" + hashtag + ".txt"
     abs_tweet_path = os.path.join(script_dir, tweet_path)
 

@@ -16,9 +16,8 @@ for hashtag in hashtags:
 
 #Q2
 print("------------Q2------------------")
-train_data, train_label = genTrainData("gohawks")
 for hashtag in hashtags:
-    train_data, train_label = genTrainData(hashtag)
+    train_data, train_label = genTrainingData(hashtag)
     model = sm.OLS(train_label, train_data)
     results = model.fit()
     print('-----------------------------------------')
