@@ -1,0 +1,50 @@
+--------------Q1----------------
+-----------------------------------------
+Statistics for gohawks:
+-----------------------------------------
+First tweet time: 2014-12-28 14:14:35
+Last tweet time: 2015-02-07 02:17:49
+Average number of tweets per hour:  193.55555555555554
+Average number of followers of users posting the tweets:  1544.9697802197802
+Average number of retweets:  0.047391248883786194
+-----------------------------------------
+Statistics for gopatriots:
+-----------------------------------------
+First tweet time: 2015-01-09 12:30:45
+Last tweet time: 2015-02-06 23:54:35
+Average number of tweets per hour:  38.40702781844802
+Average number of followers of users posting the tweets:  1298.8242710358234
+Average number of retweets:  0.02401646843549863
+-----------------------------------------
+Statistics for nfl:
+-----------------------------------------
+First tweet time: 2014-12-30 20:21:23
+Last tweet time: 2015-02-07 10:55:36
+Average number of tweets per hour:  279.4217907227616
+Average number of followers of users posting the tweets:  4289.746617531629
+Average number of retweets:  0.02469269256902835
+-----------------------------------------
+Statistics for patriots:
+-----------------------------------------
+First tweet time: 2014-12-28 14:21:19
+Last tweet time: 2015-02-07 10:55:00
+Average number of tweets per hour:  499.19775739041796
+Average number of followers of users posting the tweets:  1650.321982506216
+Average number of retweets:  0.05108706528109321
+-----------------------------------------
+Statistics for sb49:
+-----------------------------------------
+First tweet time: 2015-01-14 04:31:15
+Last tweet time: 2015-02-07 10:55:36
+Average number of tweets per hour:  1420.8780068728522
+Average number of followers of users posting the tweets:  2235.1636799951193
+Average number of retweets:  0.18383193200080777
+-----------------------------------------
+Statistics for superbowl:
+-----------------------------------------
+First tweet time: 2014-12-29 07:27:13
+Last tweet time: 2015-02-07 10:00:08
+Average number of tweets per hour:  1400.588785046729
+Average number of followers of users posting the tweets:  3591.604474474039
+Average number of retweets:  0.12015047817747616
+--- 280.80337357521057 seconds ---

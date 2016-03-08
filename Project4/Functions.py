@@ -77,20 +77,29 @@ def plotHistogram(tweetTimeDict, hashtag):
     plt.savefig('Histogram_#'+hashtag+'.png')
 
 
-def genTrainingData(hashtag):
+def genTrainingData(hashtag, newFeatures = False):
     tweet_path = "tweet_data/tweets_#" + hashtag + ".txt"
     abs_tweet_path = os.path.join(script_dir, tweet_path)
 
     train_data = []
     train_label = []
+    users = set()
+    len_tweet = []
+    n_tweets = 0
     firstIteration = True
     # Tweet count, Retweet count, Followers Count, Max Followers, Time
     r = [0, 0, 0, 0, -1]
     for line in open(abs_tweet_path, encoding="utf8"):
         tweet = json.loads(line)
+        n_tweets += 1
         retweets = tweet['metrics']['citations']['data'][0]['citations']
         followers = tweet['author']['followers']
         tweet_time = tweet['firstpost_date']
+        friends = tweet['tweet']['user']['friends_count']
+        n_hashtags = len(tweet['tweet']['entities']['hashtags'])
+        users.add(tweet['tweet']['user']['id'])
+        n_fav = tweet['tweet']['user']['favourites_count']
+        len_tweet.append(len(tweet['tweet']['text']))
         tweet_time = datetime.datetime.fromtimestamp(tweet_time)
         hour_key = datetime.datetime(tweet_time.year, tweet_time.month, tweet_time.day, tweet_time.hour, 0, 0)
 
@@ -99,17 +108,29 @@ def genTrainingData(hashtag):
             firstIteration = False
         while(cur_hour != hour_key):
             train_data.append(r)
-            train_label.append(r[0])
+            train_label.append(n_tweets)
+            n_tweets = 0
             cur_hour += timedelta(hours=1)
-            r = [0, 0, 0, 0, cur_hour.hour]
-
-        r[0] += 1                                       #Tweet count
-        r[1] += retweets                                #Number of retweets
-        r[2] += followers                               #Number of Followers
-        r[3] = followers if followers > r[3] else r[3]  #Max Followers
-        r[4] = hour_key.hour                            #Hour of Day
+            if newFeatures == False:
+                r = [0, 0, 0, 0, cur_hour.hour]
+            else:
+                users.clear()
+                len_tweet = []
+                r = [0, 0, 0, 0, 0]
+        if newFeatures == False:
+            r[0] = n_tweets                                   #Tweet count
+            r[1] += retweets                                  #Number of retweets
+            r[2] += followers                                 #Number of Followers
+            r[3] = followers if followers > r[3] else r[3]    #Max Followers
+            r[4] = hour_key.hour                              #Hour of Day
+        else:
+            r[0] += friends                                   #No of friends
+            r[1] += n_hashtags                                #Number of hashtags
+            r[2] = len(users)                                 #No of users posting
+            r[3] += n_fav                                     #No of favourites
+            r[4] = 0 if not len_tweet else np.mean(len_tweet) #Average length of tweets
     train_data.append(r)
-    train_label.append(r[0])
+    train_label.append(n_tweets)
     train_data = np.array(train_data)
     train_label = np.array(train_label)
     train_label = np.roll(train_label, -1)
