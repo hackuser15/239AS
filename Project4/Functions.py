@@ -4,6 +4,10 @@ import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 from datetime import timedelta
+import statsmodels.api as sm
+from nltk.corpus import words
+
+
 
 script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
 
@@ -137,3 +141,17 @@ def genTrainingData(hashtag, newFeatures = False):
     train_data = train_data[0:-1,:]
     train_label = train_label[0:-1]
     return train_data, train_label
+
+def getReadabilityScore(tweet):
+    w1 = tweet.split(" ")
+    ASL1 = len(w1)
+    AOV1 = 0
+    l = 0
+    for w in w1:
+        l+=len(w)
+        if(w not in words.words()):
+            AOV1+=1
+    ASW1 = l/float(ASL1)
+    S1 = 206.835 - (1.015*ASL1) - (84.6*ASW1)- (10.5*AOV1)
+    return S1
+

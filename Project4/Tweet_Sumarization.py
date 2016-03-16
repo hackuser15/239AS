@@ -6,6 +6,8 @@ import json
 import re
 #import enchant
 import datetime
+from Project4.Functions import *
+from collections import OrderedDict
 
 
 hashtags = ["gohawks","gopatriots","nfl","patriots","sb49","superbowl"]
@@ -60,23 +62,33 @@ for hashtag in hashtags:
         else:
             message = "AFTER GAME DAY"
         print(message)
+        print("-"*100)
         file = "Week"+str(file)+".txt" #name of the plain-text file
         parser = PlaintextParser.from_file(file, Tokenizer("english"))
         summarizer = LexRankSummarizer()
         summary = summarizer(parser.document, 20) #Summarize the document with 20 tweets
         tweet_list = []
         top_tweet_count = 0
+        ranked_tweets = {}
         for sentence in summary:
             #Filter out tweets with exact same message
-            t = str(sentence)
-            t = t.lower()
+            orig = str(sentence)
+            t = orig.lower()
             t = ''.join(sorted(t))
             l = [x for x in tweet_list if t == x]
-            if(len(l) <= 0):
-                top_tweet_count+=1
-                tweet_list.append(t)
-                print(str(sentence)+"\n")
-            if(top_tweet_count >=10):
+            if(len(l) > 0):
+                continue
+            score = getReadabilityScore(orig)
+            ranked_tweets[orig] = score
+            #print(orig,":",score)
+            #top_tweet_count+=1
+            tweet_list.append(t)
+        count = 0
+        for w in sorted(ranked_tweets, key=ranked_tweets.get, reverse=True):
+            if(count <= 10):
+                print(w, ranked_tweets[w])
+                count+=1
+            else:
                 break
         print("-"*50)
 
