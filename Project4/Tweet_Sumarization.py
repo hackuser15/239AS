@@ -8,7 +8,7 @@ import re
 import datetime
 from Project4.Functions import *
 from collections import OrderedDict
-
+import csv
 
 hashtags = ["gohawks","gopatriots","nfl","patriots","sb49","superbowl"]
 
@@ -20,11 +20,12 @@ for hashtag in hashtags:
     f1 = open("Week1.txt","w")
     f2 = open("Week2.txt","w")
     f3 = open("Week3.txt","w")
+    output = open("tweet_summary.txt", 'w')
 
     c1 = 0
     c2 = 0
     c3 = 0
-    max_tweets = 1000
+    max_tweets = 300
     for line in open(abs_tweet_path, encoding="utf8"):
             tweet=json.loads(line)
             text = tweet['tweet']['text']
@@ -54,6 +55,7 @@ for hashtag in hashtags:
      #3 files created for current hashtag
      #Finding 3 week summary for current hashtag
     print("Summary of Tweets for Hashtag = "+hashtag)
+    output.write("**********Summary of Tweets for Hashtag = "+hashtag+"**************")
     for file in range(1,4):
         if(file == 1):
             message = "BEFORE GAME DAY"
@@ -84,13 +86,18 @@ for hashtag in hashtags:
             #top_tweet_count+=1
             tweet_list.append(t)
         count = 0
+        output.write("-"*50+"\n")
+        output.write(message+"\n")
+        output.write("-"*50+"\n")
         for w in sorted(ranked_tweets, key=ranked_tweets.get, reverse=True):
             if(count <= 10):
                 print(w, ranked_tweets[w])
+                output.write(w+"\n")
                 count+=1
             else:
                 break
         print("-"*50)
+        output.write("-"*50+"\n")
 
     f1.close()
     f2.close()
