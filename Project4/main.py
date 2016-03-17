@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 
 start_time = time.time()
 
-# hashtags = ["gohawks","gopatriots","nfl","patriots","sb49","superbowl"]
-hashtags = ["gohawks"]
+hashtags = ["gohawks","gopatriots","nfl","patriots","sb49","superbowl"]
+# hashtags = ["gohawks"]
 
 #Q.1
 print("--------------Q1----------------")
@@ -27,7 +27,7 @@ for hashtag in hashtags:
     print('-----------------------------------------')
     print(results.summary())
 
-    with open("Linear_Regression_Result_#"+hashtag+".txt", 'w') as fp:
+    with open("./Results/Stats/Linear_Regression_Result_#"+hashtag+".txt", 'w') as fp:
         fp.write(str(results.summary()))
         fp.close()
 
@@ -43,16 +43,16 @@ for hashtag in hashtags:
     print('-----------------------------------------')
     print(results.summary())
 
-    with open("Linear_Regression_Result_New_#"+hashtag+".txt", 'w') as fp:
+    with open("./Results/Stats/Linear_Regression_Result_New_#"+hashtag+".txt", 'w') as fp:
         fp.write(str(results.summary()))
         fp.close()
-    features = ['Number of friends','Number of Hashtags','Number of Users','Number of favourites','Average tweet length']
-    for col in [0,1,3]:
-        plt.scatter(train_data[:,col],train_label, marker='o')
-        plt.xlabel(features[col])
+
+    for feature in ['NumberOfFriends','NumberOfHashtags','NumberOfFav']:
+        plt.scatter(train_data[feature],train_label, marker='o')
+        plt.xlabel(feature)
         plt.ylabel('Number of tweets')
-        plt.title('Number of tweets vs '+ features[col])
-        plt.savefig(hashtag+'-'+features[col]+'.png')
+        plt.title('Number of tweets vs '+ feature)
+        plt.savefig('./Results/Plots/'+hashtag+'-'+feature+'.png')
         plt.clf()
 
 print("--- %s seconds ---" % (time.time() - start_time))
