@@ -3,11 +3,10 @@ import json
 import datetime
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from datetime import timedelta
-import statsmodels.api as sm
+from sklearn.feature_extraction import DictVectorizer
 from nltk.corpus import words
-
-
 
 script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
 
@@ -85,6 +84,11 @@ def genTrainingData(hashtag, newFeatures = False):
     tweet_path = "tweet_data/tweets_#" + hashtag + ".txt"
     abs_tweet_path = os.path.join(script_dir, tweet_path)
 
+    if(newFeatures == True):
+        features = ["NumberOfFriends","NumberOfHashtags","NumberOfUsers","NumberOfFav","AvgTweetLength"]
+    else:
+        features = ["TweetCount","NumberOfRetweets","NumberOfFollowers","MaxFollowers","HourOfDay"]
+
     train_data = []
     train_label = []
     users = set()
@@ -140,7 +144,26 @@ def genTrainingData(hashtag, newFeatures = False):
     train_label = np.roll(train_label, -1)
     train_data = train_data[0:-1,:]
     train_label = train_label[0:-1]
+    train_data = pd.DataFrame(data=train_data, index=range(len(train_data)), columns=features)
+    train_label = pd.DataFrame(data=train_label, index=range(len(train_label)), columns=["NumberOfTweets"])
+    if(newFeatures == False):
+        train_data,_,_ = one_hot_dataframe(train_data,['HourOfDay'], replace=True)
     return train_data, train_label
+
+def one_hot_dataframe(data, cols, replace=False):
+    """ Takes a dataframe and a list of columns that need to be encoded.
+        Returns a 3-tuple comprising the data, the vectorized data,
+        and the fitted vectorizor.
+    """
+    vec = DictVectorizer()
+    mkdict = lambda row: dict((col, row[col]) for col in cols)
+    vecData = pd.DataFrame(vec.fit_transform(data[cols].apply(mkdict, axis=1)).toarray())
+    vecData.columns = vec.get_feature_names()
+    vecData.index = data.index
+    if replace is True:
+        data = data.drop(cols, axis=1)
+        data = data.join(vecData)
+    return (data, vecData, vec)
 
 def getReadabilityScore(tweet):
     w1 = tweet.split(" ")
@@ -154,4 +177,3 @@ def getReadabilityScore(tweet):
     ASW1 = l/float(ASL1)
     S1 = 206.835 - (1.015*ASL1) - (84.6*ASW1)- (10.5*AOV1)
     return S1
-
