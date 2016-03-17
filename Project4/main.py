@@ -19,7 +19,7 @@ for hashtag in hashtags:
 #Q2
 print("------------Q2------------------")
 for hashtag in hashtags:
-    train_data, train_label = genTrainingData(hashtag)
+    train_data, train_label = genTrainingData(hashtag, asNumpy=False)
     model = sm.OLS(train_label, train_data.astype(float))
     results = model.fit()
     print('-----------------------------------------')
@@ -34,7 +34,7 @@ for hashtag in hashtags:
 #Q3
 print("------------Q3------------------")
 for hashtag in hashtags:
-    train_data, train_label = genTrainingData(hashtag, newFeatures = True)
+    train_data, train_label = genTrainingData(hashtag, newFeatures = True, asNumpy=False)
     # np.savetxt('test2.txt', train_data, fmt = '%-7.2f')
     model = sm.OLS(train_label, train_data)
     results = model.fit()

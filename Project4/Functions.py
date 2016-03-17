@@ -80,7 +80,7 @@ def plotHistogram(tweetTimeDict, hashtag):
     plt.savefig('Histogram_#'+hashtag+'.png')
 
 
-def genTrainingData(hashtag, newFeatures = False):
+def genTrainingData(hashtag, newFeatures = False, asNumpy = True):
     tweet_path = "tweet_data/tweets_#" + hashtag + ".txt"
     abs_tweet_path = os.path.join(script_dir, tweet_path)
 
@@ -144,9 +144,10 @@ def genTrainingData(hashtag, newFeatures = False):
     train_label = np.roll(train_label, -1)
     train_data = train_data[0:-1,:]
     train_label = train_label[0:-1]
-    train_data = pd.DataFrame(data=train_data, index=range(len(train_data)), columns=features)
-    train_label = pd.DataFrame(data=train_label, index=range(len(train_label)), columns=["NumberOfTweets"])
-    if(newFeatures == False):
+    if(asNumpy == False):
+        train_data = pd.DataFrame(data=train_data, index=range(len(train_data)), columns=features)
+        train_label = pd.DataFrame(data=train_label, index=range(len(train_label)), columns=["NumberOfTweets"])
+    if(newFeatures == False and asNumpy == False):
         train_data,_,_ = one_hot_dataframe(train_data,['HourOfDay'], replace=True)
     return train_data, train_label
 
