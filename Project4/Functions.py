@@ -156,13 +156,13 @@ def one_hot_dataframe(data, cols, replace=False):
         and the fitted vectorizor.
     """
     vec = DictVectorizer()
-    mkdict = lambda row: dict((col, row[col]) for col in cols)
+    mkdict = lambda row: dict((col, row[col].astype(str)) for col in cols)
     vecData = pd.DataFrame(vec.fit_transform(data[cols].apply(mkdict, axis=1)).toarray())
     vecData.columns = vec.get_feature_names()
     vecData.index = data.index
     if replace is True:
         data = data.drop(cols, axis=1)
-        data = data.join(vecData)
+        data = data.join(vecData.astype(float))
     return (data, vecData, vec)
 
 def getReadabilityScore(tweet):
