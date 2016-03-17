@@ -17,10 +17,10 @@ script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
 for hashtag in hashtags:
     tweet_path = "tweet_data/tweets_#" + hashtag + ".txt"
     abs_tweet_path = os.path.join(script_dir, tweet_path)
-    f1 = open("Week1.txt","w")
-    f2 = open("Week2.txt","w")
-    f3 = open("Week3.txt","w")
-    output = open("tweet_summary.txt", 'w')
+    f1 = open("Results/Week1.txt","w")
+    f2 = open("Results/Week2.txt","w")
+    f3 = open("Results/Week3.txt","w")
+    output = open("Results/tweet_summary.txt", 'w')
 
     c1 = 0
     c2 = 0
