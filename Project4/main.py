@@ -8,7 +8,8 @@ import matplotlib.pyplot as plt
 
 start_time = time.time()
 
-hashtags = ["gohawks","gopatriots","nfl","patriots","sb49","superbowl"]
+# hashtags = ["gohawks","gopatriots","nfl","patriots","sb49","superbowl"]
+hashtags = ["gohawks"]
 
 #Q.1
 print("--------------Q1----------------")
@@ -19,7 +20,7 @@ for hashtag in hashtags:
 print("------------Q2------------------")
 for hashtag in hashtags:
     train_data, train_label = genTrainingData(hashtag)
-    model = sm.OLS(train_label, train_data)
+    model = sm.OLS(train_label, train_data.astype(float))
     results = model.fit()
     print('-----------------------------------------')
     print('Linear Regression Statistics for %s:'%hashtag)
@@ -34,7 +35,7 @@ for hashtag in hashtags:
 print("------------Q3------------------")
 for hashtag in hashtags:
     train_data, train_label = genTrainingData(hashtag, newFeatures = True)
-    np.savetxt('test2.txt', train_data, fmt = '%-7.2f')
+    # np.savetxt('test2.txt', train_data, fmt = '%-7.2f')
     model = sm.OLS(train_label, train_data)
     results = model.fit()
     print('-----------------------------------------')
