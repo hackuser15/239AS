@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from datetime import timedelta
+
+from sklearn.cross_validation import KFold
 from sklearn.feature_extraction import DictVectorizer
 from nltk.corpus import words
 
@@ -80,15 +82,22 @@ def plotHistogram(tweetTimeDict, hashtag):
     plt.savefig('Histogram_#'+hashtag+'.png')
 
 
-def genTrainingData(hashtag, newFeatures = False, asNumpy = True):
-    tweet_path = "tweet_data/tweets_#" + hashtag + ".txt"
-    abs_tweet_path = os.path.join(script_dir, tweet_path)
+def genTrainingData(hashtag, key,  newFeatures = False, asNumpy = True):
+    if key == 'train':
+        tweet_path = "tweet_data/tweets_#" + hashtag + ".txt"
+        abs_tweet_path = os.path.join(script_dir, tweet_path)
+    else:
+        tweet_path = "test_data/" + hashtag + ".txt"
+        abs_tweet_path = os.path.join(script_dir, tweet_path)
 
     if(newFeatures == True):
         features = ["NumberOfFriends","NumberOfHashtags","NumberOfUsers","NumberOfFav","AvgTweetLength"]
     else:
         features = ["TweetCount","NumberOfRetweets","NumberOfFollowers","MaxFollowers","HourOfDay"]
 
+    second = -1
+    third = -1
+    counter = 0
     train_data = []
     train_label = []
     users = set()
@@ -115,6 +124,13 @@ def genTrainingData(hashtag, newFeatures = False, asNumpy = True):
             cur_hour = hour_key
             firstIteration = False
         while(cur_hour != hour_key):
+            if tweet_time.year == 2015 and tweet_time.month == 2 and tweet_time.day == 1 and tweet_time.hour >= 7 and tweet_time.hour < 19:
+                if second == -1:
+                    second = counter + 1 #prev hour is appended, so added one here
+            elif tweet_time.year == 2015 and tweet_time.month == 2 and tweet_time.day == 1 and tweet_time.hour >= 19:
+                if third == -1:
+                    third = counter + 1
+            counter = counter + 1
             train_data.append(r)
             train_label.append(n_tweets)
             n_tweets = 0
@@ -149,7 +165,7 @@ def genTrainingData(hashtag, newFeatures = False, asNumpy = True):
         train_label = pd.DataFrame(data=train_label, index=range(len(train_label)), columns=["NumberOfTweets"])
     if(newFeatures == False and asNumpy == False):
         train_data,_,_ = one_hot_dataframe(train_data,['HourOfDay'], replace=True)
-    return train_data, train_label
+    return train_data, train_label, second, third
 
 def one_hot_dataframe(data, cols, replace=False):
     """ Takes a dataframe and a list of columns that need to be encoded.
@@ -178,3 +194,24 @@ def getReadabilityScore(tweet):
     ASW1 = l/float(ASL1)
     S1 = 206.835 - (1.015*ASL1) - (84.6*ASW1)- (10.5*AOV1)
     return S1
+
+## RandomForest Model
+def callClassifier(obj,X_train,y_train,X_test,y_test):
+    obj.fit(X_train, y_train)
+    predicted=obj.predict(X_test)
+    error = np.mean(np.absolute(np.subtract(predicted, y_test)))
+    return error
+
+## KFold
+def KfoldLR(obj,train_data,train_label,label):
+    print(label)
+    kf = KFold(train_data.shape[0], n_folds=10)
+    scores = []
+    for train_index, test_index in kf:
+        X_train, X_test = train_data[train_index], train_data[test_index]
+        y_train, y_test = train_label[train_index], train_label[test_index]
+        error = callClassifier(obj,X_train,y_train,X_test,y_test)
+        scores.append(error)
+    print("AVERAGE PREDICTION ERROR ACROSS 10 FOLDS %.2f" %(np.mean(scores)))
+    print()
+    return obj
